@@ -12,27 +12,17 @@ In this project, I implement Logistic Regression algorithm with Python. I build 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+===============================================================================
 
 
 ## 1. Introduction to Logistic Regression
 
+
 When data scientists may come across a new classification problem, the first algorithm that may come across their mind is **Logistic Regression**. It is a supervised learning classification algorithm which is used to predict observations to a discrete set of classes. Practically, it is used to classify observations into different categories. Hence, its output is discrete in nature. **Logistic Regression** is also called **Logit Regression**. It is one of the most simple, straightforward and versatile classification algorithms which is used to solve classification problems.
 
+
 People who are new to machine learning may get confused with the Logistic Regression name. They tend to think that it is a regression algorithm. But, this is not true. Logistic Regression is the classification algorithm and it is used for supervised learning classification problems. 
+
 
 So, I will start the discussion by comparing differences between Linear Regression and Logistic Regression.
 
