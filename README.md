@@ -4,7 +4,7 @@
 In this project, I implement Logistic Regression algorithm with Python. I build a classifier to predict whether or not it will rain tomorrow in Australia by training a binary classification model using Logistic Regression. I have used the **Rain in Australia** data set downloaded from the Kaggle website for this project.
 
 
-=============================================================================
+=================================================================================
 
 
 ## Table of Contents
