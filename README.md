@@ -73,7 +73,8 @@ Here, the coefficients β0 and β1 are the parameters of the model.
 
 If there are multiple explanatory variables, then the above equation can be extended to 
 
-z = β0 + β1x1+ β2x2+……..+ βnxn
+
+	z = β0 + β1x1+ β2x2+……..+ βnxn
 
 
 Here, the coefficients β0, β1, β2 and βn are the parameters of the model.
