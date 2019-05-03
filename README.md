@@ -296,4 +296,59 @@ In **Multinomial Logistic Regression**, the target variable has three or more ca
 In **Ordinal Logistic Regression**, the target variable has three or more ordinal categories. So, there is intrinsic order involved with the categories. For example, the student performance can be categorized as `poor`, `average`, `good` and `excellent`.
 
 
+===============================================================================
+
+
+## 6. References
+
+The work done in this project is inspired from following books and websites:-
+
+
+1.	Hands on Machine Learning with Scikit-Learn and Tensorflow by Aurélién Géron
+
+
+2.	Introduction to Machine Learning with Python
+
+
+3.	Udemy course – Machine Learning – A Z by Kirill Eremenko and Hadelin de Ponteves
+
+
+4.	Udemy course – Feature Engineering for Machine Learning by Soledad Galli
+
+
+5.	Udemy course – Feature Selection for Machine Learning by Soledad Galli
+
+
+6.	https://en.wikipedia.org/wiki/Logistic_regression
+
+
+7.	https://ml-cheatsheet.readthedocs.io/en/latest/logistic_regression.html
+
+
+8.	https://en.wikipedia.org/wiki/Sigmoid_function
+
+
+9.	https://www.statisticssolutions.com/assumptions-of-logistic-regression/
+
+
+10.	https://www.kaggle.com/mnassrib/titanic-logistic-regression-with-python
+
+
+11.	https://www.kaggle.com/neisha/heart-disease-prediction-using-logistic-regression
+
+
+12.	https://www.ritchieng.com/machine-learning-evaluate-classification-model/
+
+
+
+
+
+
+
+
+
+
+
+
+
 
