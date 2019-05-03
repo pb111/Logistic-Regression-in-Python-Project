@@ -10,6 +10,28 @@ In this project, I implement Logistic Regression algorithm with Python. I build 
 ## Table of Contents
 
 
+1.	Introduction to Logistic Regression
+
+
+2.	Linear Regression vs Logistic Regression
+
+
+3.	Logistic Regression intuition
+
+
+4.	Assumptions of Logistic Regression
+
+
+5.	Types of Logistic Regression
+
+
+6.	The problem statement
+
+
+7.	Results and conclusion
+
+
+8.	References
 
 
 ===============================================================================
