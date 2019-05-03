@@ -321,6 +321,21 @@ In **Ordinal Logistic Regression**, the target variable has three or more ordina
 ===============================================================================
 
 
+## 6. The problem statement
+
+
+In this project, I try to answer the question that whether or not it will rain tomorrow in Australia. I implement Logistic Regression with Python and Scikit-Learn. 
+
+
+To answer the question, I build a classifier to predict whether or not it will rain tomorrow in Australia by training a binary classification model using Logistic Regression. I have used the **Rain in Australia** dataset downloaded from the Kaggle website for this project.
+
+
+The Python implementation is presented in the Jupyter notebook
+
+
+===============================================================================
+
+
 ## 8. References
 
 The work done in this project is inspired from following books and websites:-
