@@ -336,6 +336,12 @@ The Python implementation is presented in the Jupyter notebook
 ===============================================================================
 
 
+## 7. Results and conclusion
+
+
+===============================================================================
+
+
 ## 8. References
 
 The work done in this project is inspired from following books and websites:-
