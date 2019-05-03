@@ -321,7 +321,7 @@ In **Ordinal Logistic Regression**, the target variable has three or more ordina
 ===============================================================================
 
 
-## 6. References
+## 8. References
 
 The work done in this project is inspired from following books and websites:-
 
