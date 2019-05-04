@@ -127,6 +127,8 @@ Graphically, we can represent sigmoid function with the following graph.
 
 
 
+!{Sigmoid function](https://github.com/pb111/Logistic-Regression-in-Python-Project/blob/master/Images/Sigmoid%20function.png)
+
 
 
 ### Decision boundary
