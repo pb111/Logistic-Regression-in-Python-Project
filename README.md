@@ -66,6 +66,12 @@ In this section, I will elaborate the differences between Linear Regression and 
 3.	Linear Regression is based on Ordinary Least Squares (OLS) estimation whereas Logistic Regression is based on Maximum Likelihood Estimation (MLE) approach.
 
 
+   The difference between Linear Regression and Logistic Regression can be represented diagrammatically as follows-
+   
+   
+   ![Linear Regression Vs Logistic Regression](https://github.com/pb111/Logistic-Regression-in-Python-Project/blob/master/Images/Linear%20Regression%20Vs%20Logistic%20Regression.jpeg)
+   
+   
 ===============================================================================
 
 
