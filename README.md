@@ -149,6 +149,9 @@ Mathematically, it can be expressed as follows:-
 Generally, the decision boundary is set to 0.5. So, if the probability value is 0.8 (> 0.5), we will map this observation to class 1.  Similarly, if the probability value is 0.2 (< 0.5), we will map this observation to class 0.
 
 
+![Decision boundary](https://github.com/pb111/Logistic-Regression-in-Python-Project/blob/master/Images/Logistic%20Regression_Decision%20Boundary.png)
+
+
 ### Making predictions
 
 
