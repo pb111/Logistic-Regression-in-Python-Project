@@ -183,7 +183,7 @@ Mathematically, it can be given with the following formula.
 The cross-entropy loss function can be represented with the following graphs for y = 1 and y = 0. These are smooth monotonic functions which always increases or always decreases. They help us to easily calculate the gradient and minimizing cost. 
 
 
-**Image - Cross entropy cost function from the Andrew Ng’s slides**
+![Cross entropy loss function](https://github.com/pb111/Logistic-Regression-in-Python-Project/blob/master/Images/Cross%20entropy%20loss%20function.png)
 
 
 Cross-entropy loss increases as the predicted probability diverges from the actual label. This cost-function penalizes confident and wrong predictions more than it rewards confident and right predictions. A perfect model would have a log loss of zero.
@@ -192,7 +192,7 @@ Cross-entropy loss increases as the predicted probability diverges from the actu
 The above loss-functions can be compressed into one function as follows.
 
 
-**Image**
+![Compressed logistic cost-function](https://github.com/pb111/Logistic-Regression-in-Python-Project/blob/master/Images/Compressed_logistic_cost_function.png)
 
 
 In binary classification models, where the number of classes is equal to 2, cross-entropy can be calculated as follows.
@@ -223,7 +223,7 @@ Here,
 **Vectorized cost function** can be given as follows.
 
 
-**Image**
+![Vectorized cost function](https://github.com/pb111/Logistic-Regression-in-Python-Project/blob/master/Images/Vectorized%20cost%20function.png)
 
 
 
