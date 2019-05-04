@@ -120,6 +120,9 @@ A `Sigmoid function` is a special case of the `Logistic function`. It is given b
 Graphically, we can represent sigmoid function with the following graph.
 
 
+
+
+
 ### Decision boundary
 
 
