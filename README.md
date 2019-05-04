@@ -177,7 +177,7 @@ In this case, the prediction function is non-linear due to the sigmoid transform
 Mathematically, it can be given with the following formula.
 
 
-**Formula**
+![Cross Entropy Formula](https://github.com/pb111/Logistic-Regression-in-Python-Project/blob/master/Images/Cross%20Entropy.png)
 
 
 The cross-entropy loss function can be represented with the following graphs for y = 1 and y = 0. These are smooth monotonic functions which always increases or always decreases. They help us to easily calculate the gradient and minimizing cost. 
