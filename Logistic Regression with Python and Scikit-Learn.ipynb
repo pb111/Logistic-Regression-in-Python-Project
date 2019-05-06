@@ -1,0 +1,8284 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Logistic Regression with Python and Scikit-Learn\n",
+    "\n",
+    "\n",
+    "In this project, I implement Logistic Regression with Python and Scikit-Learn. I build a classifier to predict whether or not it will rain tomorrow in Australia by training a binary classification model using Logistic Regression. I have used the **Rain in Australia** dataset downloaded from the Kaggle website for this project."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Table of Contents\n",
+    "\n",
+    "\n",
+    "The table of contents for this project is as follows:-\n",
+    "\n",
+    "\n",
+    "1.\tIntroduction to Logistic Regression\n",
+    "2.\tLogistic Regression intuition\n",
+    "3.\tThe problem statement\n",
+    "4.\tDataset description\n",
+    "5.\tImport libraries\n",
+    "6.\tImport dataset\n",
+    "7.\tExploratory data analysis\n",
+    "8.\tDeclare feature vector and target variable\n",
+    "9.\tSplit data into separate training and test set\n",
+    "10.\tFeature engineering\n",
+    "11.\tFeature scaling\n",
+    "12.\tModel training\n",
+    "13.\tPredict results\n",
+    "14.\tCheck accuracy score\n",
+    "15.\tConfusion matrix\n",
+    "16.\tClassification metrices\n",
+    "17.\tAdjusting the threshold level\n",
+    "18.\tROC - AUC\n",
+    "19.\tRecursive feature elimination\n",
+    "20.\tk-Fold Cross Validation\n",
+    "21.\tHyperparameter optimization using GridSearch CV\n",
+    "22.\tResults and conclusion\n",
+    "\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## 1. Introduction to Logistic Regression\n",
+    "\n",
+    "\n",
+    "When data scientists may come across a new classification problem, the first algorithm that may come across their mind is **Logistic Regression**. It is a supervised learning classification algorithm which is used to predict observations to a discrete set of classes. Practically, it is used to classify observations into different categories. Hence, its output is discrete in nature. **Logistic Regression** is also called **Logit Regression**. It is one of the most simple, straightforward and versatile classification algorithms which is used to solve classification problems."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## 2. Logistic Regression intuition\n",
+    "\n",
+    "\n",
+    "In statistics, the **Logistic Regression model** is a widely used statistical model which is primarily used for classification purposes. It means that given a set of observations, Logistic Regression algorithm helps us to classify these observations into two or more discrete classes. So, the target variable is discrete in nature.\n",
+    "\n",
+    "\n",
+    "Logistic Regression algorithm works by implementing a linear equation with independent or explanatory variables to predict a response value. This predicted response value, denoted by z is then converted into a probability value that lie between 0 and 1. We use the **sigmoid function** in order to map predicted values to probability values. This sigmoid function then maps any real value into a probability value between 0 and 1. \n",
+    "\n",
+    "\n",
+    "\n",
+    "The sigmoid function returns a probability value between 0 and 1. This probability value is then mapped to a discrete class which is either “0” or “1”. In order to map this probability value to a discrete class (pass/fail, yes/no, true/false), we select a threshold value. This threshold value is called **Decision boundary**. Above this threshold value, we will map the probability values into class 1 and below which we will map values into class 0.\n",
+    "\n",
+    "\n",
+    "Mathematically, it can be expressed as follows:-\n",
+    "\n",
+    "\n",
+    "                    p ≥ 0.5 => class = 1\n",
+    "    \n",
+    "                    p < 0.5 => class = 0 \n",
+    "\n",
+    "\n",
+    "Generally, the decision boundary is set to 0.5. So, if the probability value is 0.8 (> 0.5), we will map this observation to class 1.  Similarly, if the probability value is 0.2 (< 0.5), we will map this observation to class 0.\n",
+    "\n",
+    "\n",
+    "We can use our knowledge of `sigmoid function` and `decision boundary` to write a prediction function. A prediction function in logistic regression returns the probability of the observation being positive, `Yes` or `True`. We call this as `class 1` and it is denoted by `P(class = 1)`. If the probability inches closer to one, then we will be more confident about our model that the observation is in class 1.\n",
+    "\n",
+    "Logistic regression intuition is discussed in depth in the readme document."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## 3. The problem statement\n",
+    "\n",
+    "\n",
+    "In this project, I try to answer the question that whether or not it will rain tomorrow in Australia. I implement Logistic Regression with Python and Scikit-Learn. \n",
+    "\n",
+    "\n",
+    "To answer the question, I build a classifier to predict whether or not it will rain tomorrow in Australia by training a binary classification model using Logistic Regression. I have used the **Rain in Australia** dataset downloaded from the Kaggle website for this project."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## 4. Dataset description\n",
+    "\n",
+    "\n",
+    "I have used the **Rain in Australia** data set downloaded from the Kaggle website.\n",
+    "\n",
+    "\n",
+    "I have downloaded this data set from the Kaggle website. The data set can be found at the following url:-\n",
+    "\n",
+    "\n",
+    "https://www.kaggle.com/jsphyg/weather-dataset-rattle-package\n",
+    "\n",
+    "\n",
+    "This dataset contains daily weather observations from numerous Australian weather stations. "
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## 5. Import libraries"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import pandas as pd\n",
+    "import numpy as np\n",
+    "import matplotlib.pyplot as plt\n",
+    "import seaborn as sns\n",
+    "%matplotlib inline"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import warnings\n",
+    "\n",
+    "warnings.filterwarnings('ignore')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## 6. Import dataset"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 3,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "data = 'C:/datasets/weatherAUS.csv'\n",
+    "\n",
+    "df = pd.read_csv(data)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## 7. Exploratory data analysis\n",
+    "\n",
+    "\n",
+    "Now, I will explore the data to gain insights about the data. "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 4,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "(142193, 24)"
+      ]
+     },
+     "execution_count": 4,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# view dimensions of dataset\n",
+    "\n",
+    "df.shape"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "We can see that there are 142193 instances and 24 variables in the data set."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 5,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>Date</th>\n",
+       "      <th>Location</th>\n",
+       "      <th>MinTemp</th>\n",
+       "      <th>MaxTemp</th>\n",
+       "      <th>Rainfall</th>\n",
+       "      <th>Evaporation</th>\n",
+       "      <th>Sunshine</th>\n",
+       "      <th>WindGustDir</th>\n",
+       "      <th>WindGustSpeed</th>\n",
+       "      <th>WindDir9am</th>\n",
+       "      <th>...</th>\n",
+       "      <th>Humidity3pm</th>\n",
+       "      <th>Pressure9am</th>\n",
+       "      <th>Pressure3pm</th>\n",
+       "      <th>Cloud9am</th>\n",
+       "      <th>Cloud3pm</th>\n",
+       "      <th>Temp9am</th>\n",
+       "      <th>Temp3pm</th>\n",
+       "      <th>RainToday</th>\n",
+       "      <th>RISK_MM</th>\n",
+       "      <th>RainTomorrow</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>2008-12-01</td>\n",
+       "      <td>Albury</td>\n",
+       "      <td>13.4</td>\n",
+       "      <td>22.9</td>\n",
+       "      <td>0.6</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>W</td>\n",
+       "      <td>44.0</td>\n",
+       "      <td>W</td>\n",
+       "      <td>...</td>\n",
+       "      <td>22.0</td>\n",
+       "      <td>1007.7</td>\n",
+       "      <td>1007.1</td>\n",
+       "      <td>8.0</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>16.9</td>\n",
+       "      <td>21.8</td>\n",
+       "      <td>No</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>No</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>2008-12-02</td>\n",
+       "      <td>Albury</td>\n",
+       "      <td>7.4</td>\n",
+       "      <td>25.1</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>WNW</td>\n",
+       "      <td>44.0</td>\n",
+       "      <td>NNW</td>\n",
+       "      <td>...</td>\n",
+       "      <td>25.0</td>\n",
+       "      <td>1010.6</td>\n",
+       "      <td>1007.8</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>17.2</td>\n",
+       "      <td>24.3</td>\n",
+       "      <td>No</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>No</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>2008-12-03</td>\n",
+       "      <td>Albury</td>\n",
+       "      <td>12.9</td>\n",
+       "      <td>25.7</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>WSW</td>\n",
+       "      <td>46.0</td>\n",
+       "      <td>W</td>\n",
+       "      <td>...</td>\n",
+       "      <td>30.0</td>\n",
+       "      <td>1007.6</td>\n",
+       "      <td>1008.7</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>2.0</td>\n",
+       "      <td>21.0</td>\n",
+       "      <td>23.2</td>\n",
+       "      <td>No</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>No</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>2008-12-04</td>\n",
+       "      <td>Albury</td>\n",
+       "      <td>9.2</td>\n",
+       "      <td>28.0</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NE</td>\n",
+       "      <td>24.0</td>\n",
+       "      <td>SE</td>\n",
+       "      <td>...</td>\n",
+       "      <td>16.0</td>\n",
+       "      <td>1017.6</td>\n",
+       "      <td>1012.8</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>18.1</td>\n",
+       "      <td>26.5</td>\n",
+       "      <td>No</td>\n",
+       "      <td>1.0</td>\n",
+       "      <td>No</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>2008-12-05</td>\n",
+       "      <td>Albury</td>\n",
+       "      <td>17.5</td>\n",
+       "      <td>32.3</td>\n",
+       "      <td>1.0</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>W</td>\n",
+       "      <td>41.0</td>\n",
+       "      <td>ENE</td>\n",
+       "      <td>...</td>\n",
+       "      <td>33.0</td>\n",
+       "      <td>1010.8</td>\n",
+       "      <td>1006.0</td>\n",
+       "      <td>7.0</td>\n",
+       "      <td>8.0</td>\n",
+       "      <td>17.8</td>\n",
+       "      <td>29.7</td>\n",
+       "      <td>No</td>\n",
+       "      <td>0.2</td>\n",
+       "      <td>No</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "<p>5 rows × 24 columns</p>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "         Date Location  MinTemp  MaxTemp  Rainfall  Evaporation  Sunshine  \\\n",
+       "0  2008-12-01   Albury     13.4     22.9       0.6          NaN       NaN   \n",
+       "1  2008-12-02   Albury      7.4     25.1       0.0          NaN       NaN   \n",
+       "2  2008-12-03   Albury     12.9     25.7       0.0          NaN       NaN   \n",
+       "3  2008-12-04   Albury      9.2     28.0       0.0          NaN       NaN   \n",
+       "4  2008-12-05   Albury     17.5     32.3       1.0          NaN       NaN   \n",
+       "\n",
+       "  WindGustDir  WindGustSpeed WindDir9am      ...      Humidity3pm  \\\n",
+       "0           W           44.0          W      ...             22.0   \n",
+       "1         WNW           44.0        NNW      ...             25.0   \n",
+       "2         WSW           46.0          W      ...             30.0   \n",
+       "3          NE           24.0         SE      ...             16.0   \n",
+       "4           W           41.0        ENE      ...             33.0   \n",
+       "\n",
+       "   Pressure9am  Pressure3pm  Cloud9am  Cloud3pm  Temp9am  Temp3pm  RainToday  \\\n",
+       "0       1007.7       1007.1       8.0       NaN     16.9     21.8         No   \n",
+       "1       1010.6       1007.8       NaN       NaN     17.2     24.3         No   \n",
+       "2       1007.6       1008.7       NaN       2.0     21.0     23.2         No   \n",
+       "3       1017.6       1012.8       NaN       NaN     18.1     26.5         No   \n",
+       "4       1010.8       1006.0       7.0       8.0     17.8     29.7         No   \n",
+       "\n",
+       "   RISK_MM  RainTomorrow  \n",
+       "0      0.0            No  \n",
+       "1      0.0            No  \n",
+       "2      0.0            No  \n",
+       "3      1.0            No  \n",
+       "4      0.2            No  \n",
+       "\n",
+       "[5 rows x 24 columns]"
+      ]
+     },
+     "execution_count": 5,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# preview the dataset\n",
+    "\n",
+    "df.head()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 6,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "Index(['Date', 'Location', 'MinTemp', 'MaxTemp', 'Rainfall', 'Evaporation',\n",
+       "       'Sunshine', 'WindGustDir', 'WindGustSpeed', 'WindDir9am', 'WindDir3pm',\n",
+       "       'WindSpeed9am', 'WindSpeed3pm', 'Humidity9am', 'Humidity3pm',\n",
+       "       'Pressure9am', 'Pressure3pm', 'Cloud9am', 'Cloud3pm', 'Temp9am',\n",
+       "       'Temp3pm', 'RainToday', 'RISK_MM', 'RainTomorrow'],\n",
+       "      dtype='object')"
+      ]
+     },
+     "execution_count": 6,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "col_names = df.columns\n",
+    "\n",
+    "col_names"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Drop  RISK_MM variable\n",
+    "\n",
+    "It is given in the dataset description, that we should drop the `RISK_MM` feature variable from the dataset description. So, we \n",
+    "should drop it as follows-"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 7,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df.drop(['RISK_MM'], axis=1, inplace=True)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 8,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "<class 'pandas.core.frame.DataFrame'>\n",
+      "RangeIndex: 142193 entries, 0 to 142192\n",
+      "Data columns (total 23 columns):\n",
+      "Date             142193 non-null object\n",
+      "Location         142193 non-null object\n",
+      "MinTemp          141556 non-null float64\n",
+      "MaxTemp          141871 non-null float64\n",
+      "Rainfall         140787 non-null float64\n",
+      "Evaporation      81350 non-null float64\n",
+      "Sunshine         74377 non-null float64\n",
+      "WindGustDir      132863 non-null object\n",
+      "WindGustSpeed    132923 non-null float64\n",
+      "WindDir9am       132180 non-null object\n",
+      "WindDir3pm       138415 non-null object\n",
+      "WindSpeed9am     140845 non-null float64\n",
+      "WindSpeed3pm     139563 non-null float64\n",
+      "Humidity9am      140419 non-null float64\n",
+      "Humidity3pm      138583 non-null float64\n",
+      "Pressure9am      128179 non-null float64\n",
+      "Pressure3pm      128212 non-null float64\n",
+      "Cloud9am         88536 non-null float64\n",
+      "Cloud3pm         85099 non-null float64\n",
+      "Temp9am          141289 non-null float64\n",
+      "Temp3pm          139467 non-null float64\n",
+      "RainToday        140787 non-null object\n",
+      "RainTomorrow     142193 non-null object\n",
+      "dtypes: float64(16), object(7)\n",
+      "memory usage: 25.0+ MB\n"
+     ]
+    }
+   ],
+   "source": [
+    "# view summary of dataset\n",
+    "\n",
+    "df.info()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Types of variables\n",
+    "\n",
+    "\n",
+    "In this section, I segregate the dataset into categorical and numerical variables. There are a mixture of categorical and numerical variables in the dataset. Categorical variables have data type object. Numerical variables have data type float64.\n",
+    "\n",
+    "\n",
+    "First of all, I will find categorical variables."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 9,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "There are 7 categorical variables\n",
+      "\n",
+      "The categorical variables are : ['Date', 'Location', 'WindGustDir', 'WindDir9am', 'WindDir3pm', 'RainToday', 'RainTomorrow']\n"
+     ]
+    }
+   ],
+   "source": [
+    "# find categorical variables\n",
+    "\n",
+    "categorical = [var for var in df.columns if df[var].dtype=='O']\n",
+    "\n",
+    "print('There are {} categorical variables\\n'.format(len(categorical)))\n",
+    "\n",
+    "print('The categorical variables are :', categorical)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 10,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>Date</th>\n",
+       "      <th>Location</th>\n",
+       "      <th>WindGustDir</th>\n",
+       "      <th>WindDir9am</th>\n",
+       "      <th>WindDir3pm</th>\n",
+       "      <th>RainToday</th>\n",
+       "      <th>RainTomorrow</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>2008-12-01</td>\n",
+       "      <td>Albury</td>\n",
+       "      <td>W</td>\n",
+       "      <td>W</td>\n",
+       "      <td>WNW</td>\n",
+       "      <td>No</td>\n",
+       "      <td>No</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>2008-12-02</td>\n",
+       "      <td>Albury</td>\n",
+       "      <td>WNW</td>\n",
+       "      <td>NNW</td>\n",
+       "      <td>WSW</td>\n",
+       "      <td>No</td>\n",
+       "      <td>No</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>2008-12-03</td>\n",
+       "      <td>Albury</td>\n",
+       "      <td>WSW</td>\n",
+       "      <td>W</td>\n",
+       "      <td>WSW</td>\n",
+       "      <td>No</td>\n",
+       "      <td>No</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>2008-12-04</td>\n",
+       "      <td>Albury</td>\n",
+       "      <td>NE</td>\n",
+       "      <td>SE</td>\n",
+       "      <td>E</td>\n",
+       "      <td>No</td>\n",
+       "      <td>No</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>2008-12-05</td>\n",
+       "      <td>Albury</td>\n",
+       "      <td>W</td>\n",
+       "      <td>ENE</td>\n",
+       "      <td>NW</td>\n",
+       "      <td>No</td>\n",
+       "      <td>No</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "         Date Location WindGustDir WindDir9am WindDir3pm RainToday  \\\n",
+       "0  2008-12-01   Albury           W          W        WNW        No   \n",
+       "1  2008-12-02   Albury         WNW        NNW        WSW        No   \n",
+       "2  2008-12-03   Albury         WSW          W        WSW        No   \n",
+       "3  2008-12-04   Albury          NE         SE          E        No   \n",
+       "4  2008-12-05   Albury           W        ENE         NW        No   \n",
+       "\n",
+       "  RainTomorrow  \n",
+       "0           No  \n",
+       "1           No  \n",
+       "2           No  \n",
+       "3           No  \n",
+       "4           No  "
+      ]
+     },
+     "execution_count": 10,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# view the categorical variables\n",
+    "\n",
+    "df[categorical].head()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Summary of categorical variables\n",
+    "\n",
+    "\n",
+    "- There is a date variable. It is denoted by `Date` column.\n",
+    "\n",
+    "\n",
+    "- There are 6 categorical variables. These are given by `Location`, `WindGustDir`, `WindDir9am`, `WindDir3pm`, `RainToday` and  `RainTomorrow`.\n",
+    "\n",
+    "\n",
+    "- There are two binary categorical variables - `RainToday` and  `RainTomorrow`.\n",
+    "\n",
+    "\n",
+    "- `RainTomorrow` is the target variable."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Explore problems within categorical variables\n",
+    "\n",
+    "\n",
+    "First, I will explore the categorical variables.\n",
+    "\n",
+    "\n",
+    "### Missing values in categorical variables"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 11,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "Date                0\n",
+       "Location            0\n",
+       "WindGustDir      9330\n",
+       "WindDir9am      10013\n",
+       "WindDir3pm       3778\n",
+       "RainToday        1406\n",
+       "RainTomorrow        0\n",
+       "dtype: int64"
+      ]
+     },
+     "execution_count": 11,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# check missing values in categorical variables\n",
+    "\n",
+    "df[categorical].isnull().sum()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 12,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "WindGustDir     9330\n",
+      "WindDir9am     10013\n",
+      "WindDir3pm      3778\n",
+      "RainToday       1406\n",
+      "dtype: int64\n"
+     ]
+    }
+   ],
+   "source": [
+    "# print categorical variables containing missing values\n",
+    "\n",
+    "cat1 = [var for var in categorical if df[var].isnull().sum()!=0]\n",
+    "\n",
+    "print(df[cat1].isnull().sum())"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "We can see that there are only 4 categorical variables in the dataset which contains missing values. These are `WindGustDir`, `WindDir9am`, `WindDir3pm` and `RainToday`."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Frequency counts of categorical variables\n",
+    "\n",
+    "\n",
+    "Now, I will check the frequency counts of categorical variables."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 13,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "2014-10-12    49\n",
+      "2017-01-15    49\n",
+      "2013-10-02    49\n",
+      "2014-07-15    49\n",
+      "2014-02-19    49\n",
+      "2016-08-21    49\n",
+      "2014-07-03    49\n",
+      "2016-10-21    49\n",
+      "2013-03-11    49\n",
+      "2017-02-08    49\n",
+      "2014-11-17    49\n",
+      "2013-04-25    49\n",
+      "2014-11-19    49\n",
+      "2014-08-30    49\n",
+      "2014-01-07    49\n",
+      "2013-04-10    49\n",
+      "2017-03-16    49\n",
+      "2013-09-04    49\n",
+      "2016-08-16    49\n",
+      "2016-10-19    49\n",
+      "2014-08-20    49\n",
+      "2017-05-12    49\n",
+      "2014-01-16    49\n",
+      "2016-07-22    49\n",
+      "2017-01-22    49\n",
+      "2013-09-25    49\n",
+      "2013-06-02    49\n",
+      "2016-07-06    49\n",
+      "2014-04-21    49\n",
+      "2013-10-16    49\n",
+      "              ..\n",
+      "2007-11-23     1\n",
+      "2008-01-15     1\n",
+      "2007-12-22     1\n",
+      "2007-11-08     1\n",
+      "2007-11-29     1\n",
+      "2008-01-29     1\n",
+      "2008-01-06     1\n",
+      "2007-11-02     1\n",
+      "2007-12-25     1\n",
+      "2008-01-28     1\n",
+      "2007-12-08     1\n",
+      "2007-11-09     1\n",
+      "2008-01-05     1\n",
+      "2007-11-26     1\n",
+      "2007-11-10     1\n",
+      "2007-11-20     1\n",
+      "2008-01-14     1\n",
+      "2007-12-03     1\n",
+      "2008-01-12     1\n",
+      "2007-11-03     1\n",
+      "2007-12-02     1\n",
+      "2008-01-31     1\n",
+      "2007-12-01     1\n",
+      "2007-11-06     1\n",
+      "2007-11-27     1\n",
+      "2007-12-19     1\n",
+      "2007-11-19     1\n",
+      "2007-12-30     1\n",
+      "2007-12-23     1\n",
+      "2008-01-09     1\n",
+      "Name: Date, Length: 3436, dtype: int64\n",
+      "Canberra            3418\n",
+      "Sydney              3337\n",
+      "Perth               3193\n",
+      "Darwin              3192\n",
+      "Hobart              3188\n",
+      "Brisbane            3161\n",
+      "Adelaide            3090\n",
+      "Bendigo             3034\n",
+      "Townsville          3033\n",
+      "AliceSprings        3031\n",
+      "MountGambier        3030\n",
+      "Launceston          3028\n",
+      "Ballarat            3028\n",
+      "Albany              3016\n",
+      "Albury              3011\n",
+      "PerthAirport        3009\n",
+      "MelbourneAirport    3009\n",
+      "Mildura             3007\n",
+      "SydneyAirport       3005\n",
+      "Nuriootpa           3002\n",
+      "Sale                3000\n",
+      "Watsonia            2999\n",
+      "Tuggeranong         2998\n",
+      "Portland            2996\n",
+      "Woomera             2990\n",
+      "Cairns              2988\n",
+      "Cobar               2988\n",
+      "Wollongong          2983\n",
+      "GoldCoast           2980\n",
+      "WaggaWagga          2976\n",
+      "NorfolkIsland       2964\n",
+      "Penrith             2964\n",
+      "Newcastle           2955\n",
+      "SalmonGums          2955\n",
+      "CoffsHarbour        2953\n",
+      "Witchcliffe         2952\n",
+      "Richmond            2951\n",
+      "Dartmoor            2943\n",
+      "NorahHead           2929\n",
+      "BadgerysCreek       2928\n",
+      "MountGinini         2907\n",
+      "Moree               2854\n",
+      "Walpole             2819\n",
+      "PearceRAAF          2762\n",
+      "Williamtown         2553\n",
+      "Melbourne           2435\n",
+      "Nhil                1569\n",
+      "Katherine           1559\n",
+      "Uluru               1521\n",
+      "Name: Location, dtype: int64\n",
+      "W      9780\n",
+      "SE     9309\n",
+      "E      9071\n",
+      "N      9033\n",
+      "SSE    8993\n",
+      "S      8949\n",
+      "WSW    8901\n",
+      "SW     8797\n",
+      "SSW    8610\n",
+      "WNW    8066\n",
+      "NW     8003\n",
+      "ENE    7992\n",
+      "ESE    7305\n",
+      "NE     7060\n",
+      "NNW    6561\n",
+      "NNE    6433\n",
+      "Name: WindGustDir, dtype: int64\n",
+      "N      11393\n",
+      "SE      9162\n",
+      "E       9024\n",
+      "SSE     8966\n",
+      "NW      8552\n",
+      "S       8493\n",
+      "W       8260\n",
+      "SW      8237\n",
+      "NNE     7948\n",
+      "NNW     7840\n",
+      "ENE     7735\n",
+      "ESE     7558\n",
+      "NE      7527\n",
+      "SSW     7448\n",
+      "WNW     7194\n",
+      "WSW     6843\n",
+      "Name: WindDir9am, dtype: int64\n",
+      "SE     10663\n",
+      "W       9911\n",
+      "S       9598\n",
+      "WSW     9329\n",
+      "SW      9182\n",
+      "SSE     9142\n",
+      "N       8667\n",
+      "WNW     8656\n",
+      "NW      8468\n",
+      "ESE     8382\n",
+      "E       8342\n",
+      "NE      8164\n",
+      "SSW     8010\n",
+      "NNW     7733\n",
+      "ENE     7724\n",
+      "NNE     6444\n",
+      "Name: WindDir3pm, dtype: int64\n",
+      "No     109332\n",
+      "Yes     31455\n",
+      "Name: RainToday, dtype: int64\n",
+      "No     110316\n",
+      "Yes     31877\n",
+      "Name: RainTomorrow, dtype: int64\n"
+     ]
+    }
+   ],
+   "source": [
+    "# view frequency of categorical variables\n",
+    "\n",
+    "for var in categorical: \n",
+    "    \n",
+    "    print(df[var].value_counts())"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 14,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "2014-10-12    0.000345\n",
+      "2017-01-15    0.000345\n",
+      "2013-10-02    0.000345\n",
+      "2014-07-15    0.000345\n",
+      "2014-02-19    0.000345\n",
+      "2016-08-21    0.000345\n",
+      "2014-07-03    0.000345\n",
+      "2016-10-21    0.000345\n",
+      "2013-03-11    0.000345\n",
+      "2017-02-08    0.000345\n",
+      "2014-11-17    0.000345\n",
+      "2013-04-25    0.000345\n",
+      "2014-11-19    0.000345\n",
+      "2014-08-30    0.000345\n",
+      "2014-01-07    0.000345\n",
+      "2013-04-10    0.000345\n",
+      "2017-03-16    0.000345\n",
+      "2013-09-04    0.000345\n",
+      "2016-08-16    0.000345\n",
+      "2016-10-19    0.000345\n",
+      "2014-08-20    0.000345\n",
+      "2017-05-12    0.000345\n",
+      "2014-01-16    0.000345\n",
+      "2016-07-22    0.000345\n",
+      "2017-01-22    0.000345\n",
+      "2013-09-25    0.000345\n",
+      "2013-06-02    0.000345\n",
+      "2016-07-06    0.000345\n",
+      "2014-04-21    0.000345\n",
+      "2013-10-16    0.000345\n",
+      "                ...   \n",
+      "2007-11-23    0.000007\n",
+      "2008-01-15    0.000007\n",
+      "2007-12-22    0.000007\n",
+      "2007-11-08    0.000007\n",
+      "2007-11-29    0.000007\n",
+      "2008-01-29    0.000007\n",
+      "2008-01-06    0.000007\n",
+      "2007-11-02    0.000007\n",
+      "2007-12-25    0.000007\n",
+      "2008-01-28    0.000007\n",
+      "2007-12-08    0.000007\n",
+      "2007-11-09    0.000007\n",
+      "2008-01-05    0.000007\n",
+      "2007-11-26    0.000007\n",
+      "2007-11-10    0.000007\n",
+      "2007-11-20    0.000007\n",
+      "2008-01-14    0.000007\n",
+      "2007-12-03    0.000007\n",
+      "2008-01-12    0.000007\n",
+      "2007-11-03    0.000007\n",
+      "2007-12-02    0.000007\n",
+      "2008-01-31    0.000007\n",
+      "2007-12-01    0.000007\n",
+      "2007-11-06    0.000007\n",
+      "2007-11-27    0.000007\n",
+      "2007-12-19    0.000007\n",
+      "2007-11-19    0.000007\n",
+      "2007-12-30    0.000007\n",
+      "2007-12-23    0.000007\n",
+      "2008-01-09    0.000007\n",
+      "Name: Date, Length: 3436, dtype: float64\n",
+      "Canberra            0.024038\n",
+      "Sydney              0.023468\n",
+      "Perth               0.022455\n",
+      "Darwin              0.022448\n",
+      "Hobart              0.022420\n",
+      "Brisbane            0.022230\n",
+      "Adelaide            0.021731\n",
+      "Bendigo             0.021337\n",
+      "Townsville          0.021330\n",
+      "AliceSprings        0.021316\n",
+      "MountGambier        0.021309\n",
+      "Launceston          0.021295\n",
+      "Ballarat            0.021295\n",
+      "Albany              0.021211\n",
+      "Albury              0.021175\n",
+      "PerthAirport        0.021161\n",
+      "MelbourneAirport    0.021161\n",
+      "Mildura             0.021147\n",
+      "SydneyAirport       0.021133\n",
+      "Nuriootpa           0.021112\n",
+      "Sale                0.021098\n",
+      "Watsonia            0.021091\n",
+      "Tuggeranong         0.021084\n",
+      "Portland            0.021070\n",
+      "Woomera             0.021028\n",
+      "Cairns              0.021014\n",
+      "Cobar               0.021014\n",
+      "Wollongong          0.020979\n",
+      "GoldCoast           0.020957\n",
+      "WaggaWagga          0.020929\n",
+      "NorfolkIsland       0.020845\n",
+      "Penrith             0.020845\n",
+      "Newcastle           0.020782\n",
+      "SalmonGums          0.020782\n",
+      "CoffsHarbour        0.020768\n",
+      "Witchcliffe         0.020761\n",
+      "Richmond            0.020753\n",
+      "Dartmoor            0.020697\n",
+      "NorahHead           0.020599\n",
+      "BadgerysCreek       0.020592\n",
+      "MountGinini         0.020444\n",
+      "Moree               0.020071\n",
+      "Walpole             0.019825\n",
+      "PearceRAAF          0.019424\n",
+      "Williamtown         0.017954\n",
+      "Melbourne           0.017125\n",
+      "Nhil                0.011034\n",
+      "Katherine           0.010964\n",
+      "Uluru               0.010697\n",
+      "Name: Location, dtype: float64\n",
+      "W      0.068780\n",
+      "SE     0.065467\n",
+      "E      0.063794\n",
+      "N      0.063526\n",
+      "SSE    0.063245\n",
+      "S      0.062936\n",
+      "WSW    0.062598\n",
+      "SW     0.061867\n",
+      "SSW    0.060552\n",
+      "WNW    0.056726\n",
+      "NW     0.056283\n",
+      "ENE    0.056205\n",
+      "ESE    0.051374\n",
+      "NE     0.049651\n",
+      "NNW    0.046142\n",
+      "NNE    0.045241\n",
+      "Name: WindGustDir, dtype: float64\n",
+      "N      0.080123\n",
+      "SE     0.064434\n",
+      "E      0.063463\n",
+      "SSE    0.063055\n",
+      "NW     0.060144\n",
+      "S      0.059729\n",
+      "W      0.058090\n",
+      "SW     0.057928\n",
+      "NNE    0.055896\n",
+      "NNW    0.055136\n",
+      "ENE    0.054398\n",
+      "ESE    0.053153\n",
+      "NE     0.052935\n",
+      "SSW    0.052380\n",
+      "WNW    0.050593\n",
+      "WSW    0.048125\n",
+      "Name: WindDir9am, dtype: float64\n",
+      "SE     0.074990\n",
+      "W      0.069701\n",
+      "S      0.067500\n",
+      "WSW    0.065608\n",
+      "SW     0.064574\n",
+      "SSE    0.064293\n",
+      "N      0.060952\n",
+      "WNW    0.060875\n",
+      "NW     0.059553\n",
+      "ESE    0.058948\n",
+      "E      0.058667\n",
+      "NE     0.057415\n",
+      "SSW    0.056332\n",
+      "NNW    0.054384\n",
+      "ENE    0.054321\n",
+      "NNE    0.045319\n",
+      "Name: WindDir3pm, dtype: float64\n",
+      "No     0.768899\n",
+      "Yes    0.221213\n",
+      "Name: RainToday, dtype: float64\n",
+      "No     0.775819\n",
+      "Yes    0.224181\n",
+      "Name: RainTomorrow, dtype: float64\n"
+     ]
+    }
+   ],
+   "source": [
+    "# view frequency distribution of categorical variables\n",
+    "\n",
+    "for var in categorical: \n",
+    "    \n",
+    "    print(df[var].value_counts()/np.float(len(df)))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Number of labels: cardinality\n",
+    "\n",
+    "\n",
+    "The number of labels within a categorical variable is known as **cardinality**. A high number of labels within a variable is known as **high cardinality**. High cardinality may pose some serious problems in the machine learning model. So, I will check for high cardinality."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 15,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Date  contains  3436  labels\n",
+      "Location  contains  49  labels\n",
+      "WindGustDir  contains  17  labels\n",
+      "WindDir9am  contains  17  labels\n",
+      "WindDir3pm  contains  17  labels\n",
+      "RainToday  contains  3  labels\n",
+      "RainTomorrow  contains  2  labels\n"
+     ]
+    }
+   ],
+   "source": [
+    "# check for cardinality in categorical variables\n",
+    "\n",
+    "for var in categorical:\n",
+    "    \n",
+    "    print(var, ' contains ', len(df[var].unique()), ' labels')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "We can see that there is a `Date` variable which needs to be preprocessed. I will do preprocessing in the following section.\n",
+    "\n",
+    "\n",
+    "All the other variables contain relatively smaller number of variables."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Feature Engineering of Date Variable"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 16,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "dtype('O')"
+      ]
+     },
+     "execution_count": 16,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df['Date'].dtypes"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "We can see that the data type of `Date` variable is object. I will parse the date currently coded as object into datetime format."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 17,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# parse the dates, currently coded as strings, into datetime format\n",
+    "\n",
+    "df['Date'] = pd.to_datetime(df['Date'])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 18,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "0    2008\n",
+       "1    2008\n",
+       "2    2008\n",
+       "3    2008\n",
+       "4    2008\n",
+       "Name: Year, dtype: int64"
+      ]
+     },
+     "execution_count": 18,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# extract year from date\n",
+    "\n",
+    "df['Year'] = df['Date'].dt.year\n",
+    "\n",
+    "df['Year'].head()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 19,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "0    12\n",
+       "1    12\n",
+       "2    12\n",
+       "3    12\n",
+       "4    12\n",
+       "Name: Month, dtype: int64"
+      ]
+     },
+     "execution_count": 19,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# extract month from date\n",
+    "\n",
+    "df['Month'] = df['Date'].dt.month\n",
+    "\n",
+    "df['Month'].head()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 20,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "0    1\n",
+       "1    2\n",
+       "2    3\n",
+       "3    4\n",
+       "4    5\n",
+       "Name: Day, dtype: int64"
+      ]
+     },
+     "execution_count": 20,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# extract day from date\n",
+    "\n",
+    "df['Day'] = df['Date'].dt.day\n",
+    "\n",
+    "df['Day'].head()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 21,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "<class 'pandas.core.frame.DataFrame'>\n",
+      "RangeIndex: 142193 entries, 0 to 142192\n",
+      "Data columns (total 26 columns):\n",
+      "Date             142193 non-null datetime64[ns]\n",
+      "Location         142193 non-null object\n",
+      "MinTemp          141556 non-null float64\n",
+      "MaxTemp          141871 non-null float64\n",
+      "Rainfall         140787 non-null float64\n",
+      "Evaporation      81350 non-null float64\n",
+      "Sunshine         74377 non-null float64\n",
+      "WindGustDir      132863 non-null object\n",
+      "WindGustSpeed    132923 non-null float64\n",
+      "WindDir9am       132180 non-null object\n",
+      "WindDir3pm       138415 non-null object\n",
+      "WindSpeed9am     140845 non-null float64\n",
+      "WindSpeed3pm     139563 non-null float64\n",
+      "Humidity9am      140419 non-null float64\n",
+      "Humidity3pm      138583 non-null float64\n",
+      "Pressure9am      128179 non-null float64\n",
+      "Pressure3pm      128212 non-null float64\n",
+      "Cloud9am         88536 non-null float64\n",
+      "Cloud3pm         85099 non-null float64\n",
+      "Temp9am          141289 non-null float64\n",
+      "Temp3pm          139467 non-null float64\n",
+      "RainToday        140787 non-null object\n",
+      "RainTomorrow     142193 non-null object\n",
+      "Year             142193 non-null int64\n",
+      "Month            142193 non-null int64\n",
+      "Day              142193 non-null int64\n",
+      "dtypes: datetime64[ns](1), float64(16), int64(3), object(6)\n",
+      "memory usage: 28.2+ MB\n"
+     ]
+    }
+   ],
+   "source": [
+    "# again view the summary of dataset\n",
+    "\n",
+    "df.info()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "We can see that there are three additional columns created from `Date` variable. Now, I will drop the original `Date` variable from the dataset."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 22,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# drop the original Date variable\n",
+    "\n",
+    "df.drop('Date', axis=1, inplace = True)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 23,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>Location</th>\n",
+       "      <th>MinTemp</th>\n",
+       "      <th>MaxTemp</th>\n",
+       "      <th>Rainfall</th>\n",
+       "      <th>Evaporation</th>\n",
+       "      <th>Sunshine</th>\n",
+       "      <th>WindGustDir</th>\n",
+       "      <th>WindGustSpeed</th>\n",
+       "      <th>WindDir9am</th>\n",
+       "      <th>WindDir3pm</th>\n",
+       "      <th>...</th>\n",
+       "      <th>Pressure3pm</th>\n",
+       "      <th>Cloud9am</th>\n",
+       "      <th>Cloud3pm</th>\n",
+       "      <th>Temp9am</th>\n",
+       "      <th>Temp3pm</th>\n",
+       "      <th>RainToday</th>\n",
+       "      <th>RainTomorrow</th>\n",
+       "      <th>Year</th>\n",
+       "      <th>Month</th>\n",
+       "      <th>Day</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>Albury</td>\n",
+       "      <td>13.4</td>\n",
+       "      <td>22.9</td>\n",
+       "      <td>0.6</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>W</td>\n",
+       "      <td>44.0</td>\n",
+       "      <td>W</td>\n",
+       "      <td>WNW</td>\n",
+       "      <td>...</td>\n",
+       "      <td>1007.1</td>\n",
+       "      <td>8.0</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>16.9</td>\n",
+       "      <td>21.8</td>\n",
+       "      <td>No</td>\n",
+       "      <td>No</td>\n",
+       "      <td>2008</td>\n",
+       "      <td>12</td>\n",
+       "      <td>1</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>Albury</td>\n",
+       "      <td>7.4</td>\n",
+       "      <td>25.1</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>WNW</td>\n",
+       "      <td>44.0</td>\n",
+       "      <td>NNW</td>\n",
+       "      <td>WSW</td>\n",
+       "      <td>...</td>\n",
+       "      <td>1007.8</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>17.2</td>\n",
+       "      <td>24.3</td>\n",
+       "      <td>No</td>\n",
+       "      <td>No</td>\n",
+       "      <td>2008</td>\n",
+       "      <td>12</td>\n",
+       "      <td>2</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>Albury</td>\n",
+       "      <td>12.9</td>\n",
+       "      <td>25.7</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>WSW</td>\n",
+       "      <td>46.0</td>\n",
+       "      <td>W</td>\n",
+       "      <td>WSW</td>\n",
+       "      <td>...</td>\n",
+       "      <td>1008.7</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>2.0</td>\n",
+       "      <td>21.0</td>\n",
+       "      <td>23.2</td>\n",
+       "      <td>No</td>\n",
+       "      <td>No</td>\n",
+       "      <td>2008</td>\n",
+       "      <td>12</td>\n",
+       "      <td>3</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>Albury</td>\n",
+       "      <td>9.2</td>\n",
+       "      <td>28.0</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NE</td>\n",
+       "      <td>24.0</td>\n",
+       "      <td>SE</td>\n",
+       "      <td>E</td>\n",
+       "      <td>...</td>\n",
+       "      <td>1012.8</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>18.1</td>\n",
+       "      <td>26.5</td>\n",
+       "      <td>No</td>\n",
+       "      <td>No</td>\n",
+       "      <td>2008</td>\n",
+       "      <td>12</td>\n",
+       "      <td>4</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>Albury</td>\n",
+       "      <td>17.5</td>\n",
+       "      <td>32.3</td>\n",
+       "      <td>1.0</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>W</td>\n",
+       "      <td>41.0</td>\n",
+       "      <td>ENE</td>\n",
+       "      <td>NW</td>\n",
+       "      <td>...</td>\n",
+       "      <td>1006.0</td>\n",
+       "      <td>7.0</td>\n",
+       "      <td>8.0</td>\n",
+       "      <td>17.8</td>\n",
+       "      <td>29.7</td>\n",
+       "      <td>No</td>\n",
+       "      <td>No</td>\n",
+       "      <td>2008</td>\n",
+       "      <td>12</td>\n",
+       "      <td>5</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "<p>5 rows × 25 columns</p>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "  Location  MinTemp  MaxTemp  Rainfall  Evaporation  Sunshine WindGustDir  \\\n",
+       "0   Albury     13.4     22.9       0.6          NaN       NaN           W   \n",
+       "1   Albury      7.4     25.1       0.0          NaN       NaN         WNW   \n",
+       "2   Albury     12.9     25.7       0.0          NaN       NaN         WSW   \n",
+       "3   Albury      9.2     28.0       0.0          NaN       NaN          NE   \n",
+       "4   Albury     17.5     32.3       1.0          NaN       NaN           W   \n",
+       "\n",
+       "   WindGustSpeed WindDir9am WindDir3pm ...   Pressure3pm  Cloud9am  Cloud3pm  \\\n",
+       "0           44.0          W        WNW ...        1007.1       8.0       NaN   \n",
+       "1           44.0        NNW        WSW ...        1007.8       NaN       NaN   \n",
+       "2           46.0          W        WSW ...        1008.7       NaN       2.0   \n",
+       "3           24.0         SE          E ...        1012.8       NaN       NaN   \n",
+       "4           41.0        ENE         NW ...        1006.0       7.0       8.0   \n",
+       "\n",
+       "   Temp9am  Temp3pm  RainToday  RainTomorrow  Year  Month  Day  \n",
+       "0     16.9     21.8         No            No  2008     12    1  \n",
+       "1     17.2     24.3         No            No  2008     12    2  \n",
+       "2     21.0     23.2         No            No  2008     12    3  \n",
+       "3     18.1     26.5         No            No  2008     12    4  \n",
+       "4     17.8     29.7         No            No  2008     12    5  \n",
+       "\n",
+       "[5 rows x 25 columns]"
+      ]
+     },
+     "execution_count": 23,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# preview the dataset again\n",
+    "\n",
+    "df.head()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Now, we can see that the `Date` variable has been removed from the dataset.\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Explore Categorical Variables\n",
+    "\n",
+    "\n",
+    "Now, I will explore the categorical variables one by one. "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 24,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "There are 6 categorical variables\n",
+      "\n",
+      "The categorical variables are : ['Location', 'WindGustDir', 'WindDir9am', 'WindDir3pm', 'RainToday', 'RainTomorrow']\n"
+     ]
+    }
+   ],
+   "source": [
+    "# find categorical variables\n",
+    "\n",
+    "categorical = [var for var in df.columns if df[var].dtype=='O']\n",
+    "\n",
+    "print('There are {} categorical variables\\n'.format(len(categorical)))\n",
+    "\n",
+    "print('The categorical variables are :', categorical)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "We can see that there are 6 categorical variables in the dataset. The `Date` variable has been removed. First, I will check missing values in categorical variables."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 25,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "Location            0\n",
+       "WindGustDir      9330\n",
+       "WindDir9am      10013\n",
+       "WindDir3pm       3778\n",
+       "RainToday        1406\n",
+       "RainTomorrow        0\n",
+       "dtype: int64"
+      ]
+     },
+     "execution_count": 25,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# check for missing values in categorical variables \n",
+    "\n",
+    "df[categorical].isnull().sum()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "We can see that `WindGustDir`, `WindDir9am`, `WindDir3pm`, `RainToday` variables contain missing values. I will explore these variables one by one."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Explore `Location` variable"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 26,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Location contains 49 labels\n"
+     ]
+    }
+   ],
+   "source": [
+    "# print number of labels in Location variable\n",
+    "\n",
+    "print('Location contains', len(df.Location.unique()), 'labels')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 27,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "array(['Albury', 'BadgerysCreek', 'Cobar', 'CoffsHarbour', 'Moree',\n",
+       "       'Newcastle', 'NorahHead', 'NorfolkIsland', 'Penrith', 'Richmond',\n",
+       "       'Sydney', 'SydneyAirport', 'WaggaWagga', 'Williamtown',\n",
+       "       'Wollongong', 'Canberra', 'Tuggeranong', 'MountGinini', 'Ballarat',\n",
+       "       'Bendigo', 'Sale', 'MelbourneAirport', 'Melbourne', 'Mildura',\n",
+       "       'Nhil', 'Portland', 'Watsonia', 'Dartmoor', 'Brisbane', 'Cairns',\n",
+       "       'GoldCoast', 'Townsville', 'Adelaide', 'MountGambier', 'Nuriootpa',\n",
+       "       'Woomera', 'Albany', 'Witchcliffe', 'PearceRAAF', 'PerthAirport',\n",
+       "       'Perth', 'SalmonGums', 'Walpole', 'Hobart', 'Launceston',\n",
+       "       'AliceSprings', 'Darwin', 'Katherine', 'Uluru'], dtype=object)"
+      ]
+     },
+     "execution_count": 27,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# check labels in location variable\n",
+    "\n",
+    "df.Location.unique()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 28,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "Canberra            3418\n",
+       "Sydney              3337\n",
+       "Perth               3193\n",
+       "Darwin              3192\n",
+       "Hobart              3188\n",
+       "Brisbane            3161\n",
+       "Adelaide            3090\n",
+       "Bendigo             3034\n",
+       "Townsville          3033\n",
+       "AliceSprings        3031\n",
+       "MountGambier        3030\n",
+       "Launceston          3028\n",
+       "Ballarat            3028\n",
+       "Albany              3016\n",
+       "Albury              3011\n",
+       "PerthAirport        3009\n",
+       "MelbourneAirport    3009\n",
+       "Mildura             3007\n",
+       "SydneyAirport       3005\n",
+       "Nuriootpa           3002\n",
+       "Sale                3000\n",
+       "Watsonia            2999\n",
+       "Tuggeranong         2998\n",
+       "Portland            2996\n",
+       "Woomera             2990\n",
+       "Cairns              2988\n",
+       "Cobar               2988\n",
+       "Wollongong          2983\n",
+       "GoldCoast           2980\n",
+       "WaggaWagga          2976\n",
+       "NorfolkIsland       2964\n",
+       "Penrith             2964\n",
+       "Newcastle           2955\n",
+       "SalmonGums          2955\n",
+       "CoffsHarbour        2953\n",
+       "Witchcliffe         2952\n",
+       "Richmond            2951\n",
+       "Dartmoor            2943\n",
+       "NorahHead           2929\n",
+       "BadgerysCreek       2928\n",
+       "MountGinini         2907\n",
+       "Moree               2854\n",
+       "Walpole             2819\n",
+       "PearceRAAF          2762\n",
+       "Williamtown         2553\n",
+       "Melbourne           2435\n",
+       "Nhil                1569\n",
+       "Katherine           1559\n",
+       "Uluru               1521\n",
+       "Name: Location, dtype: int64"
+      ]
+     },
+     "execution_count": 28,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# check frequency distribution of values in Location variable\n",
+    "\n",
+    "df.Location.value_counts()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 29,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>Albany</th>\n",
+       "      <th>Albury</th>\n",
+       "      <th>AliceSprings</th>\n",
+       "      <th>BadgerysCreek</th>\n",
+       "      <th>Ballarat</th>\n",
+       "      <th>Bendigo</th>\n",
+       "      <th>Brisbane</th>\n",
+       "      <th>Cairns</th>\n",
+       "      <th>Canberra</th>\n",
+       "      <th>Cobar</th>\n",
+       "      <th>...</th>\n",
+       "      <th>Townsville</th>\n",
+       "      <th>Tuggeranong</th>\n",
+       "      <th>Uluru</th>\n",
+       "      <th>WaggaWagga</th>\n",
+       "      <th>Walpole</th>\n",
+       "      <th>Watsonia</th>\n",
+       "      <th>Williamtown</th>\n",
+       "      <th>Witchcliffe</th>\n",
+       "      <th>Wollongong</th>\n",
+       "      <th>Woomera</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>0</td>\n",
+       "      <td>1</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>...</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>0</td>\n",
+       "      <td>1</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>...</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>0</td>\n",
+       "      <td>1</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>...</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>0</td>\n",
+       "      <td>1</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>...</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>0</td>\n",
+       "      <td>1</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>...</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "<p>5 rows × 48 columns</p>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "   Albany  Albury  AliceSprings  BadgerysCreek  Ballarat  Bendigo  Brisbane  \\\n",
+       "0       0       1             0              0         0        0         0   \n",
+       "1       0       1             0              0         0        0         0   \n",
+       "2       0       1             0              0         0        0         0   \n",
+       "3       0       1             0              0         0        0         0   \n",
+       "4       0       1             0              0         0        0         0   \n",
+       "\n",
+       "   Cairns  Canberra  Cobar   ...     Townsville  Tuggeranong  Uluru  \\\n",
+       "0       0         0      0   ...              0            0      0   \n",
+       "1       0         0      0   ...              0            0      0   \n",
+       "2       0         0      0   ...              0            0      0   \n",
+       "3       0         0      0   ...              0            0      0   \n",
+       "4       0         0      0   ...              0            0      0   \n",
+       "\n",
+       "   WaggaWagga  Walpole  Watsonia  Williamtown  Witchcliffe  Wollongong  \\\n",
+       "0           0        0         0            0            0           0   \n",
+       "1           0        0         0            0            0           0   \n",
+       "2           0        0         0            0            0           0   \n",
+       "3           0        0         0            0            0           0   \n",
+       "4           0        0         0            0            0           0   \n",
+       "\n",
+       "   Woomera  \n",
+       "0        0  \n",
+       "1        0  \n",
+       "2        0  \n",
+       "3        0  \n",
+       "4        0  \n",
+       "\n",
+       "[5 rows x 48 columns]"
+      ]
+     },
+     "execution_count": 29,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# let's do One Hot Encoding of Location variable\n",
+    "# get k-1 dummy variables after One Hot Encoding \n",
+    "# preview the dataset with head() method\n",
+    "\n",
+    "pd.get_dummies(df.Location, drop_first=True).head()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Explore `WindGustDir` variable"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 30,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "WindGustDir contains 17 labels\n"
+     ]
+    }
+   ],
+   "source": [
+    "# print number of labels in WindGustDir variable\n",
+    "\n",
+    "print('WindGustDir contains', len(df['WindGustDir'].unique()), 'labels')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 31,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "array(['W', 'WNW', 'WSW', 'NE', 'NNW', 'N', 'NNE', 'SW', 'ENE', 'SSE',\n",
+       "       'S', 'NW', 'SE', 'ESE', nan, 'E', 'SSW'], dtype=object)"
+      ]
+     },
+     "execution_count": 31,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# check labels in WindGustDir variable\n",
+    "\n",
+    "df['WindGustDir'].unique()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 32,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "W      9780\n",
+       "SE     9309\n",
+       "E      9071\n",
+       "N      9033\n",
+       "SSE    8993\n",
+       "S      8949\n",
+       "WSW    8901\n",
+       "SW     8797\n",
+       "SSW    8610\n",
+       "WNW    8066\n",
+       "NW     8003\n",
+       "ENE    7992\n",
+       "ESE    7305\n",
+       "NE     7060\n",
+       "NNW    6561\n",
+       "NNE    6433\n",
+       "Name: WindGustDir, dtype: int64"
+      ]
+     },
+     "execution_count": 32,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# check frequency distribution of values in WindGustDir variable\n",
+    "\n",
+    "df.WindGustDir.value_counts()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 33,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>ENE</th>\n",
+       "      <th>ESE</th>\n",
+       "      <th>N</th>\n",
+       "      <th>NE</th>\n",
+       "      <th>NNE</th>\n",
+       "      <th>NNW</th>\n",
+       "      <th>NW</th>\n",
+       "      <th>S</th>\n",
+       "      <th>SE</th>\n",
+       "      <th>SSE</th>\n",
+       "      <th>SSW</th>\n",
+       "      <th>SW</th>\n",
+       "      <th>W</th>\n",
+       "      <th>WNW</th>\n",
+       "      <th>WSW</th>\n",
+       "      <th>nan</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>1</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>1</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>1</td>\n",
+       "      <td>0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>1</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>1</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "   ENE  ESE  N  NE  NNE  NNW  NW  S  SE  SSE  SSW  SW  W  WNW  WSW  NaN\n",
+       "0    0    0  0   0    0    0   0  0   0    0    0   0  1    0    0    0\n",
+       "1    0    0  0   0    0    0   0  0   0    0    0   0  0    1    0    0\n",
+       "2    0    0  0   0    0    0   0  0   0    0    0   0  0    0    1    0\n",
+       "3    0    0  0   1    0    0   0  0   0    0    0   0  0    0    0    0\n",
+       "4    0    0  0   0    0    0   0  0   0    0    0   0  1    0    0    0"
+      ]
+     },
+     "execution_count": 33,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# let's do One Hot Encoding of WindGustDir variable\n",
+    "# get k-1 dummy variables after One Hot Encoding \n",
+    "# also add an additional dummy variable to indicate there was missing data\n",
+    "# preview the dataset with head() method\n",
+    "\n",
+    "pd.get_dummies(df.WindGustDir, drop_first=True, dummy_na=True).head()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 34,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "ENE    7992\n",
+       "ESE    7305\n",
+       "N      9033\n",
+       "NE     7060\n",
+       "NNE    6433\n",
+       "NNW    6561\n",
+       "NW     8003\n",
+       "S      8949\n",
+       "SE     9309\n",
+       "SSE    8993\n",
+       "SSW    8610\n",
+       "SW     8797\n",
+       "W      9780\n",
+       "WNW    8066\n",
+       "WSW    8901\n",
+       "NaN    9330\n",
+       "dtype: int64"
+      ]
+     },
+     "execution_count": 34,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# sum the number of 1s per boolean variable over the rows of the dataset\n",
+    "# it will tell us how many observations we have for each category\n",
+    "\n",
+    "pd.get_dummies(df.WindGustDir, drop_first=True, dummy_na=True).sum(axis=0)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "We can see that there are 9330 missing values in WindGustDir variable."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Explore `WindDir9am` variable"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 35,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "WindDir9am contains 17 labels\n"
+     ]
+    }
+   ],
+   "source": [
+    "# print number of labels in WindDir9am variable\n",
+    "\n",
+    "print('WindDir9am contains', len(df['WindDir9am'].unique()), 'labels')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 36,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "array(['W', 'NNW', 'SE', 'ENE', 'SW', 'SSE', 'S', 'NE', nan, 'SSW', 'N',\n",
+       "       'WSW', 'ESE', 'E', 'NW', 'WNW', 'NNE'], dtype=object)"
+      ]
+     },
+     "execution_count": 36,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# check labels in WindDir9am variable\n",
+    "\n",
+    "df['WindDir9am'].unique()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 37,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "N      11393\n",
+       "SE      9162\n",
+       "E       9024\n",
+       "SSE     8966\n",
+       "NW      8552\n",
+       "S       8493\n",
+       "W       8260\n",
+       "SW      8237\n",
+       "NNE     7948\n",
+       "NNW     7840\n",
+       "ENE     7735\n",
+       "ESE     7558\n",
+       "NE      7527\n",
+       "SSW     7448\n",
+       "WNW     7194\n",
+       "WSW     6843\n",
+       "Name: WindDir9am, dtype: int64"
+      ]
+     },
+     "execution_count": 37,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# check frequency distribution of values in WindDir9am variable\n",
+    "\n",
+    "df['WindDir9am'].value_counts()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 38,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>ENE</th>\n",
+       "      <th>ESE</th>\n",
+       "      <th>N</th>\n",
+       "      <th>NE</th>\n",
+       "      <th>NNE</th>\n",
+       "      <th>NNW</th>\n",
+       "      <th>NW</th>\n",
+       "      <th>S</th>\n",
+       "      <th>SE</th>\n",
+       "      <th>SSE</th>\n",
+       "      <th>SSW</th>\n",
+       "      <th>SW</th>\n",
+       "      <th>W</th>\n",
+       "      <th>WNW</th>\n",
+       "      <th>WSW</th>\n",
+       "      <th>nan</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>1</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>1</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>1</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>1</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>1</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "   ENE  ESE  N  NE  NNE  NNW  NW  S  SE  SSE  SSW  SW  W  WNW  WSW  NaN\n",
+       "0    0    0  0   0    0    0   0  0   0    0    0   0  1    0    0    0\n",
+       "1    0    0  0   0    0    1   0  0   0    0    0   0  0    0    0    0\n",
+       "2    0    0  0   0    0    0   0  0   0    0    0   0  1    0    0    0\n",
+       "3    0    0  0   0    0    0   0  0   1    0    0   0  0    0    0    0\n",
+       "4    1    0  0   0    0    0   0  0   0    0    0   0  0    0    0    0"
+      ]
+     },
+     "execution_count": 38,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# let's do One Hot Encoding of WindDir9am variable\n",
+    "# get k-1 dummy variables after One Hot Encoding \n",
+    "# also add an additional dummy variable to indicate there was missing data\n",
+    "# preview the dataset with head() method\n",
+    "\n",
+    "pd.get_dummies(df.WindDir9am, drop_first=True, dummy_na=True).head()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 39,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "ENE     7735\n",
+       "ESE     7558\n",
+       "N      11393\n",
+       "NE      7527\n",
+       "NNE     7948\n",
+       "NNW     7840\n",
+       "NW      8552\n",
+       "S       8493\n",
+       "SE      9162\n",
+       "SSE     8966\n",
+       "SSW     7448\n",
+       "SW      8237\n",
+       "W       8260\n",
+       "WNW     7194\n",
+       "WSW     6843\n",
+       "NaN    10013\n",
+       "dtype: int64"
+      ]
+     },
+     "execution_count": 39,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# sum the number of 1s per boolean variable over the rows of the dataset\n",
+    "# it will tell us how many observations we have for each category\n",
+    "\n",
+    "pd.get_dummies(df.WindDir9am, drop_first=True, dummy_na=True).sum(axis=0)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "We can see that there are 10013 missing values in the `WindDir9am` variable."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Explore `WindDir3pm` variable"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 40,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "WindDir3pm contains 17 labels\n"
+     ]
+    }
+   ],
+   "source": [
+    "# print number of labels in WindDir3pm variable\n",
+    "\n",
+    "print('WindDir3pm contains', len(df['WindDir3pm'].unique()), 'labels')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 41,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "array(['WNW', 'WSW', 'E', 'NW', 'W', 'SSE', 'ESE', 'ENE', 'NNW', 'SSW',\n",
+       "       'SW', 'SE', 'N', 'S', 'NNE', nan, 'NE'], dtype=object)"
+      ]
+     },
+     "execution_count": 41,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# check labels in WindDir3pm variable\n",
+    "\n",
+    "df['WindDir3pm'].unique()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 42,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "SE     10663\n",
+       "W       9911\n",
+       "S       9598\n",
+       "WSW     9329\n",
+       "SW      9182\n",
+       "SSE     9142\n",
+       "N       8667\n",
+       "WNW     8656\n",
+       "NW      8468\n",
+       "ESE     8382\n",
+       "E       8342\n",
+       "NE      8164\n",
+       "SSW     8010\n",
+       "NNW     7733\n",
+       "ENE     7724\n",
+       "NNE     6444\n",
+       "Name: WindDir3pm, dtype: int64"
+      ]
+     },
+     "execution_count": 42,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# check frequency distribution of values in WindDir3pm variable\n",
+    "\n",
+    "df['WindDir3pm'].value_counts()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 43,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>ENE</th>\n",
+       "      <th>ESE</th>\n",
+       "      <th>N</th>\n",
+       "      <th>NE</th>\n",
+       "      <th>NNE</th>\n",
+       "      <th>NNW</th>\n",
+       "      <th>NW</th>\n",
+       "      <th>S</th>\n",
+       "      <th>SE</th>\n",
+       "      <th>SSE</th>\n",
+       "      <th>SSW</th>\n",
+       "      <th>SW</th>\n",
+       "      <th>W</th>\n",
+       "      <th>WNW</th>\n",
+       "      <th>WSW</th>\n",
+       "      <th>nan</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>1</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>1</td>\n",
+       "      <td>0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>1</td>\n",
+       "      <td>0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>1</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "   ENE  ESE  N  NE  NNE  NNW  NW  S  SE  SSE  SSW  SW  W  WNW  WSW  NaN\n",
+       "0    0    0  0   0    0    0   0  0   0    0    0   0  0    1    0    0\n",
+       "1    0    0  0   0    0    0   0  0   0    0    0   0  0    0    1    0\n",
+       "2    0    0  0   0    0    0   0  0   0    0    0   0  0    0    1    0\n",
+       "3    0    0  0   0    0    0   0  0   0    0    0   0  0    0    0    0\n",
+       "4    0    0  0   0    0    0   1  0   0    0    0   0  0    0    0    0"
+      ]
+     },
+     "execution_count": 43,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# let's do One Hot Encoding of WindDir3pm variable\n",
+    "# get k-1 dummy variables after One Hot Encoding \n",
+    "# also add an additional dummy variable to indicate there was missing data\n",
+    "# preview the dataset with head() method\n",
+    "\n",
+    "pd.get_dummies(df.WindDir3pm, drop_first=True, dummy_na=True).head()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 44,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "ENE     7724\n",
+       "ESE     8382\n",
+       "N       8667\n",
+       "NE      8164\n",
+       "NNE     6444\n",
+       "NNW     7733\n",
+       "NW      8468\n",
+       "S       9598\n",
+       "SE     10663\n",
+       "SSE     9142\n",
+       "SSW     8010\n",
+       "SW      9182\n",
+       "W       9911\n",
+       "WNW     8656\n",
+       "WSW     9329\n",
+       "NaN     3778\n",
+       "dtype: int64"
+      ]
+     },
+     "execution_count": 44,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# sum the number of 1s per boolean variable over the rows of the dataset\n",
+    "# it will tell us how many observations we have for each category\n",
+    "\n",
+    "pd.get_dummies(df.WindDir3pm, drop_first=True, dummy_na=True).sum(axis=0)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "There are 3778 missing values in the `WindDir3pm` variable."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Explore `RainToday` variable"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 45,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "RainToday contains 3 labels\n"
+     ]
+    }
+   ],
+   "source": [
+    "# print number of labels in RainToday variable\n",
+    "\n",
+    "print('RainToday contains', len(df['RainToday'].unique()), 'labels')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 46,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "array(['No', 'Yes', nan], dtype=object)"
+      ]
+     },
+     "execution_count": 46,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# check labels in WindGustDir variable\n",
+    "\n",
+    "df['RainToday'].unique()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 47,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "No     109332\n",
+       "Yes     31455\n",
+       "Name: RainToday, dtype: int64"
+      ]
+     },
+     "execution_count": 47,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# check frequency distribution of values in WindGustDir variable\n",
+    "\n",
+    "df.RainToday.value_counts()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 48,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>Yes</th>\n",
+       "      <th>nan</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "   Yes  NaN\n",
+       "0    0    0\n",
+       "1    0    0\n",
+       "2    0    0\n",
+       "3    0    0\n",
+       "4    0    0"
+      ]
+     },
+     "execution_count": 48,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# let's do One Hot Encoding of RainToday variable\n",
+    "# get k-1 dummy variables after One Hot Encoding \n",
+    "# also add an additional dummy variable to indicate there was missing data\n",
+    "# preview the dataset with head() method\n",
+    "\n",
+    "pd.get_dummies(df.RainToday, drop_first=True, dummy_na=True).head()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 49,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "Yes    31455\n",
+       "NaN     1406\n",
+       "dtype: int64"
+      ]
+     },
+     "execution_count": 49,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# sum the number of 1s per boolean variable over the rows of the dataset\n",
+    "# it will tell us how many observations we have for each category\n",
+    "\n",
+    "pd.get_dummies(df.RainToday, drop_first=True, dummy_na=True).sum(axis=0)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "There are 1406 missing values in the `RainToday` variable."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Explore Numerical Variables"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 50,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "There are 19 numerical variables\n",
+      "\n",
+      "The numerical variables are : ['MinTemp', 'MaxTemp', 'Rainfall', 'Evaporation', 'Sunshine', 'WindGustSpeed', 'WindSpeed9am', 'WindSpeed3pm', 'Humidity9am', 'Humidity3pm', 'Pressure9am', 'Pressure3pm', 'Cloud9am', 'Cloud3pm', 'Temp9am', 'Temp3pm', 'Year', 'Month', 'Day']\n"
+     ]
+    }
+   ],
+   "source": [
+    "# find numerical variables\n",
+    "\n",
+    "numerical = [var for var in df.columns if df[var].dtype!='O']\n",
+    "\n",
+    "print('There are {} numerical variables\\n'.format(len(numerical)))\n",
+    "\n",
+    "print('The numerical variables are :', numerical)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 51,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>MinTemp</th>\n",
+       "      <th>MaxTemp</th>\n",
+       "      <th>Rainfall</th>\n",
+       "      <th>Evaporation</th>\n",
+       "      <th>Sunshine</th>\n",
+       "      <th>WindGustSpeed</th>\n",
+       "      <th>WindSpeed9am</th>\n",
+       "      <th>WindSpeed3pm</th>\n",
+       "      <th>Humidity9am</th>\n",
+       "      <th>Humidity3pm</th>\n",
+       "      <th>Pressure9am</th>\n",
+       "      <th>Pressure3pm</th>\n",
+       "      <th>Cloud9am</th>\n",
+       "      <th>Cloud3pm</th>\n",
+       "      <th>Temp9am</th>\n",
+       "      <th>Temp3pm</th>\n",
+       "      <th>Year</th>\n",
+       "      <th>Month</th>\n",
+       "      <th>Day</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>13.4</td>\n",
+       "      <td>22.9</td>\n",
+       "      <td>0.6</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>44.0</td>\n",
+       "      <td>20.0</td>\n",
+       "      <td>24.0</td>\n",
+       "      <td>71.0</td>\n",
+       "      <td>22.0</td>\n",
+       "      <td>1007.7</td>\n",
+       "      <td>1007.1</td>\n",
+       "      <td>8.0</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>16.9</td>\n",
+       "      <td>21.8</td>\n",
+       "      <td>2008</td>\n",
+       "      <td>12</td>\n",
+       "      <td>1</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>7.4</td>\n",
+       "      <td>25.1</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>44.0</td>\n",
+       "      <td>4.0</td>\n",
+       "      <td>22.0</td>\n",
+       "      <td>44.0</td>\n",
+       "      <td>25.0</td>\n",
+       "      <td>1010.6</td>\n",
+       "      <td>1007.8</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>17.2</td>\n",
+       "      <td>24.3</td>\n",
+       "      <td>2008</td>\n",
+       "      <td>12</td>\n",
+       "      <td>2</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>12.9</td>\n",
+       "      <td>25.7</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>46.0</td>\n",
+       "      <td>19.0</td>\n",
+       "      <td>26.0</td>\n",
+       "      <td>38.0</td>\n",
+       "      <td>30.0</td>\n",
+       "      <td>1007.6</td>\n",
+       "      <td>1008.7</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>2.0</td>\n",
+       "      <td>21.0</td>\n",
+       "      <td>23.2</td>\n",
+       "      <td>2008</td>\n",
+       "      <td>12</td>\n",
+       "      <td>3</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>9.2</td>\n",
+       "      <td>28.0</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>24.0</td>\n",
+       "      <td>11.0</td>\n",
+       "      <td>9.0</td>\n",
+       "      <td>45.0</td>\n",
+       "      <td>16.0</td>\n",
+       "      <td>1017.6</td>\n",
+       "      <td>1012.8</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>18.1</td>\n",
+       "      <td>26.5</td>\n",
+       "      <td>2008</td>\n",
+       "      <td>12</td>\n",
+       "      <td>4</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>17.5</td>\n",
+       "      <td>32.3</td>\n",
+       "      <td>1.0</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>41.0</td>\n",
+       "      <td>7.0</td>\n",
+       "      <td>20.0</td>\n",
+       "      <td>82.0</td>\n",
+       "      <td>33.0</td>\n",
+       "      <td>1010.8</td>\n",
+       "      <td>1006.0</td>\n",
+       "      <td>7.0</td>\n",
+       "      <td>8.0</td>\n",
+       "      <td>17.8</td>\n",
+       "      <td>29.7</td>\n",
+       "      <td>2008</td>\n",
+       "      <td>12</td>\n",
+       "      <td>5</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "   MinTemp  MaxTemp  Rainfall  Evaporation  Sunshine  WindGustSpeed  \\\n",
+       "0     13.4     22.9       0.6          NaN       NaN           44.0   \n",
+       "1      7.4     25.1       0.0          NaN       NaN           44.0   \n",
+       "2     12.9     25.7       0.0          NaN       NaN           46.0   \n",
+       "3      9.2     28.0       0.0          NaN       NaN           24.0   \n",
+       "4     17.5     32.3       1.0          NaN       NaN           41.0   \n",
+       "\n",
+       "   WindSpeed9am  WindSpeed3pm  Humidity9am  Humidity3pm  Pressure9am  \\\n",
+       "0          20.0          24.0         71.0         22.0       1007.7   \n",
+       "1           4.0          22.0         44.0         25.0       1010.6   \n",
+       "2          19.0          26.0         38.0         30.0       1007.6   \n",
+       "3          11.0           9.0         45.0         16.0       1017.6   \n",
+       "4           7.0          20.0         82.0         33.0       1010.8   \n",
+       "\n",
+       "   Pressure3pm  Cloud9am  Cloud3pm  Temp9am  Temp3pm  Year  Month  Day  \n",
+       "0       1007.1       8.0       NaN     16.9     21.8  2008     12    1  \n",
+       "1       1007.8       NaN       NaN     17.2     24.3  2008     12    2  \n",
+       "2       1008.7       NaN       2.0     21.0     23.2  2008     12    3  \n",
+       "3       1012.8       NaN       NaN     18.1     26.5  2008     12    4  \n",
+       "4       1006.0       7.0       8.0     17.8     29.7  2008     12    5  "
+      ]
+     },
+     "execution_count": 51,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# view the numerical variables\n",
+    "\n",
+    "df[numerical].head()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Summary of numerical variables\n",
+    "\n",
+    "\n",
+    "- There are 16 numerical variables. \n",
+    "\n",
+    "\n",
+    "- These are given by `MinTemp`, `MaxTemp`, `Rainfall`, `Evaporation`, `Sunshine`, `WindGustSpeed`, `WindSpeed9am`, `WindSpeed3pm`, `Humidity9am`, `Humidity3pm`, `Pressure9am`, `Pressure3pm`, `Cloud9am`, `Cloud3pm`, `Temp9am` and `Temp3pm`.\n",
+    "\n",
+    "\n",
+    "- All of the numerical variables are of continuous type."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Explore problems within numerical variables\n",
+    "\n",
+    "\n",
+    "Now, I will explore the numerical variables.\n",
+    "\n",
+    "\n",
+    "### Missing values in numerical variables"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 52,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "MinTemp            637\n",
+       "MaxTemp            322\n",
+       "Rainfall          1406\n",
+       "Evaporation      60843\n",
+       "Sunshine         67816\n",
+       "WindGustSpeed     9270\n",
+       "WindSpeed9am      1348\n",
+       "WindSpeed3pm      2630\n",
+       "Humidity9am       1774\n",
+       "Humidity3pm       3610\n",
+       "Pressure9am      14014\n",
+       "Pressure3pm      13981\n",
+       "Cloud9am         53657\n",
+       "Cloud3pm         57094\n",
+       "Temp9am            904\n",
+       "Temp3pm           2726\n",
+       "Year                 0\n",
+       "Month                0\n",
+       "Day                  0\n",
+       "dtype: int64"
+      ]
+     },
+     "execution_count": 52,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# check missing values in numerical variables\n",
+    "\n",
+    "df[numerical].isnull().sum()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "We can see that all the 16 numerical variables contain missing values."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Outliers in numerical variables"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 53,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "        MinTemp   MaxTemp  Rainfall  Evaporation  Sunshine  WindGustSpeed  \\\n",
+      "count  141556.0  141871.0  140787.0      81350.0   74377.0       132923.0   \n",
+      "mean       12.0      23.0       2.0          5.0       8.0           40.0   \n",
+      "std         6.0       7.0       8.0          4.0       4.0           14.0   \n",
+      "min        -8.0      -5.0       0.0          0.0       0.0            6.0   \n",
+      "25%         8.0      18.0       0.0          3.0       5.0           31.0   \n",
+      "50%        12.0      23.0       0.0          5.0       8.0           39.0   \n",
+      "75%        17.0      28.0       1.0          7.0      11.0           48.0   \n",
+      "max        34.0      48.0     371.0        145.0      14.0          135.0   \n",
+      "\n",
+      "       WindSpeed9am  WindSpeed3pm  Humidity9am  Humidity3pm  Pressure9am  \\\n",
+      "count      140845.0      139563.0     140419.0     138583.0     128179.0   \n",
+      "mean           14.0          19.0         69.0         51.0       1018.0   \n",
+      "std             9.0           9.0         19.0         21.0          7.0   \n",
+      "min             0.0           0.0          0.0          0.0        980.0   \n",
+      "25%             7.0          13.0         57.0         37.0       1013.0   \n",
+      "50%            13.0          19.0         70.0         52.0       1018.0   \n",
+      "75%            19.0          24.0         83.0         66.0       1022.0   \n",
+      "max           130.0          87.0        100.0        100.0       1041.0   \n",
+      "\n",
+      "       Pressure3pm  Cloud9am  Cloud3pm   Temp9am   Temp3pm      Year  \\\n",
+      "count     128212.0   88536.0   85099.0  141289.0  139467.0  142193.0   \n",
+      "mean        1015.0       4.0       5.0      17.0      22.0    2013.0   \n",
+      "std            7.0       3.0       3.0       6.0       7.0       3.0   \n",
+      "min          977.0       0.0       0.0      -7.0      -5.0    2007.0   \n",
+      "25%         1010.0       1.0       2.0      12.0      17.0    2011.0   \n",
+      "50%         1015.0       5.0       5.0      17.0      21.0    2013.0   \n",
+      "75%         1020.0       7.0       7.0      22.0      26.0    2015.0   \n",
+      "max         1040.0       9.0       9.0      40.0      47.0    2017.0   \n",
+      "\n",
+      "          Month       Day  \n",
+      "count  142193.0  142193.0  \n",
+      "mean        6.0      16.0  \n",
+      "std         3.0       9.0  \n",
+      "min         1.0       1.0  \n",
+      "25%         3.0       8.0  \n",
+      "50%         6.0      16.0  \n",
+      "75%         9.0      23.0  \n",
+      "max        12.0      31.0   2\n"
+     ]
+    }
+   ],
+   "source": [
+    "# view summary statistics in numerical variables\n",
+    "\n",
+    "print(round(df[numerical].describe()),2)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "On closer inspection, we can see that the `Rainfall`, `Evaporation`, `WindSpeed9am` and `WindSpeed3pm` columns may contain outliers.\n",
+    "\n",
+    "\n",
+    "I will draw boxplots to visualise outliers in the above variables. "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 54,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "Text(0,0.5,'WindSpeed3pm')"
+      ]
+     },
+     "execution_count": 54,
+     "metadata": {},
+     "output_type": "execute_result"
+    },
+    {
+     "data": {
+      "image/png": "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\n",
+      "text/plain": [
+       "<Figure size 1080x720 with 4 Axes>"
+      ]
+     },
+     "metadata": {
+      "needs_background": "light"
+     },
+     "output_type": "display_data"
+    }
+   ],
+   "source": [
+    "# draw boxplots to visualize outliers\n",
+    "\n",
+    "plt.figure(figsize=(15,10))\n",
+    "\n",
+    "\n",
+    "plt.subplot(2, 2, 1)\n",
+    "fig = df.boxplot(column='Rainfall')\n",
+    "fig.set_title('')\n",
+    "fig.set_ylabel('Rainfall')\n",
+    "\n",
+    "\n",
+    "plt.subplot(2, 2, 2)\n",
+    "fig = df.boxplot(column='Evaporation')\n",
+    "fig.set_title('')\n",
+    "fig.set_ylabel('Evaporation')\n",
+    "\n",
+    "\n",
+    "plt.subplot(2, 2, 3)\n",
+    "fig = df.boxplot(column='WindSpeed9am')\n",
+    "fig.set_title('')\n",
+    "fig.set_ylabel('WindSpeed9am')\n",
+    "\n",
+    "\n",
+    "plt.subplot(2, 2, 4)\n",
+    "fig = df.boxplot(column='WindSpeed3pm')\n",
+    "fig.set_title('')\n",
+    "fig.set_ylabel('WindSpeed3pm')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The above boxplots confirm that there are lot of outliers in these variables."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Check the distribution of variables\n",
+    "\n",
+    "\n",
+    "Now, I will plot the histograms to check distributions to find out if they are normal or skewed. If the variable follows normal distribution, then I will do `Extreme Value Analysis` otherwise if they are skewed, I will find IQR (Interquantile range)."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 55,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "Text(0,0.5,'RainTomorrow')"
+      ]
+     },
+     "execution_count": 55,
+     "metadata": {},
+     "output_type": "execute_result"
+    },
+    {
+     "data": {
+      "image/png": "iVBORw0KGgoAAAANSUhEUgAAA5EAAAJQCAYAAAAXEeAaAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEgAACxIB0t1+/AAAADl0RVh0U29mdHdhcmUAbWF0cGxvdGxpYiB2ZXJzaW9uIDIuMi4zLCBodHRwOi8vbWF0cGxvdGxpYi5vcmcvIxREBQAAIABJREFUeJzs3X2YJXV95/33J4woPiAgcZYwbAbjxAQxKs4Cid65esXgoMZxdzXici+jITv37WI0idmI616SqOzq7hIixuCyMhG8iUCILhOD4izS6yYR5EHkUWVEIiNE1AFkNGoGv/cf9Ws5NN3TNdMP55zm/bquc52qb/2qzrdqevrX31NVv0pVIUmSJElSHz8x7AQkSZIkSePDIlKSJEmS1JtFpCRJkiSpN4tISZIkSVJvFpGSJEmSpN4sIiVJkiRJvVlESpIkSZJ6s4iUJEmSJPVmESlJkiRJ6m3FsBMYFQceeGCtXr16Xtv47ne/yxOe8ISFSWiJjWvu45o3mPswjGveYO4L6dprr/1WVf3ksPMYFwvRP8Lo/RzsjnHOHcx/2MY5/3HOHcx/T/TtIy0im9WrV3PNNdfMaxuTk5NMTEwsTEJLbFxzH9e8wdyHYVzzBnNfSEn+btg5jJOF6B9h9H4Odsc45w7mP2zjnP845w7mvyf69pFezipJkiRJ6s0iUpIkSZLUm0WkJEmSJKk3i0hJkiRJUm8WkZIkjZAkv53k5iQ3JflIksclOTTJVUluS3Jhkr1b28e2+a1t+eqB7by1xb+U5MUD8XUttjXJKUu/h5KkcbdoRWSSTUnuSXLTDMt+N0klObDNJ8mZrUO7IckRA203tE7ztiQbBuLPS3JjW+fMJGnxA5Jsae23JNl/sfZRkqSFlORg4I3A2qo6HNgLOB54D3BGVa0B7gVOaqucBNxbVU8HzmjtSHJYW++ZwDrgT5LslWQv4P3AccBhwGtaW0mSelvMM5Efouu4HibJIcCvAF8bCB8HrGmvjcBZre0BwKnAUcCRwKkDReFZre3UelOfdQpweetoL2/zkiSNixXAPklWAI8H7gZeCFzclp8LvKJNr2/ztOXHtC9V1wMXVNUPquqrwFa6fvRIYGtV3V5VPwQuaG0lSept0YrIqvoMsH2GRWcAvwfUQGw9cF51rgT2S3IQ8GJgS1Vtr6p7gS3AurZs36r6bFUVcB4zd6iDHa0kSSOtqr4O/De6L1rvBu4HrgXuq6qdrdk24OA2fTBwZ1t3Z2v/lMH4tHVmi0uS1NuKpfywJC8Hvl5VX2hXn07Z3c7u4DY9PQ6wsqruBqiqu5M8dUF3QpKkRdKutlkPHArcB/w53dU60019EZtZls0Wn+nL45oeSLKR7mofVq5cyeTk5Fypz2nHjh0Lsp1hGOfcwfyHbZzzH+fcwfwX05IVkUkeD7wNOHamxTPEdtUJzhbf3ZwWtJMc5X/ouYxr7uOaN5j7MIxr3mDujyIvAr5aVd8ESPJR4JfortBZ0c42rgLuau23AYcA29rlr0+muwpoKj5lcJ3Z4j9WVWcDZwOsXbu2JiYm5r1jk5OTLMR2hmGccwfzH7Zxzn+ccwfzX0xLeSbyZ+i+WZ06C7kKuC7Jkcze2W0DJqbFJ1t81QztAb6R5KB2FvIg4J7ZElroTvJ951/C6X/93XltY6Hc8e6X7lb7Uf4h3ZVxzRvMfRjGNW8w90eRrwFHty9e/wE4BrgGuAJ4Jd09jBuAS1r7zW3+s235p6uqkmwG/izJHwI/RTd2wOfovoRdk+RQ4Ot0g+/866XYsRu/fj+vPeWvluKjdml3+0dJ0iMt2SM+qurGqnpqVa2uqtV0heARVfX3dJ3giW2U1qOB+9slqZcBxybZv13icyxwWVv2QJKj2wACJ/LIDhUe3tFKkjTSquoqugFyrgNupOunzwbeAvxOkq109zye01Y5B3hKi/8ObTC5qroZuAi4BfgkcHJVPdjOZL6Brn+9FbiotZUkqbdFOxOZ5CN0ZxEPTLINOLWqzpml+aXAS+hGj/se8DqAqtqe5J3A1a3dO6pqarCe19ONALsP8In2Ang3cFGSk+i+0X3VAu6WJEmLqqpOpRuZfNDtdCOrTm/7fWbp56rqNOC0GeKX0vW7kiTtkUUrIqvqNXMsXz0wXcDJs7TbBGyaIX4NcPgM8W/TXf4jSZIkSVpgS3Y5qyRJkiRp/FlESpIkSZJ6s4iUJEmSJPVmESlJkiRJ6s0iUpIkSZLUm0WkJEmSJKk3i0hJkiRJUm8WkZIkSZKk3iwiJUmSJEm9WURKkiRJknqziJQkSZIk9WYRKUmSJEnqzSJSkiRJktSbRaQkSZIkqTeLSEmSJElSbxaRkiRJkqTeLCIlSZIkSb1ZREqSJEmSerOIlCRJkiT1ZhEpSZIkSerNIlKSpBGR5BlJrh94fSfJbyU5IMmWJLe19/1b+yQ5M8nWJDckOWJgWxta+9uSbBiIPy/JjW2dM5NkGPsqSRpfFpGSJI2IqvpSVT2nqp4DPA/4HvAx4BTg8qpaA1ze5gGOA9a010bgLIAkBwCnAkcBRwKnThWerc3GgfXWLcGuSZKWEYtISZJG0zHAV6rq74D1wLktfi7wija9HjivOlcC+yU5CHgxsKWqtlfVvcAWYF1btm9VfbaqCjhvYFuSJPViESlJ0mg6HvhIm15ZVXcDtPentvjBwJ0D62xrsV3Ft80QlySptxXDTkCSJD1ckr2BlwNvnavpDLHag/j0z99Id8krK1euZHJyco405rZyH3jzs3bOezvztSf7smPHjgU5BsNi/sM1zvmPc+5g/otp0YrIJJuAlwH3VNXhLfZfgV8Ffgh8BXhdVd3Xlr0VOAl4EHhjVV3W4uuA9wJ7AR+sqne3+KHABcABwHXAv6mqHyZ5LN3lOc8Dvg28uqruWKz9lCRpERwHXFdV32jz30hyUFXd3S5JvafFtwGHDKy3CrirxSemxSdbfNUM7R+mqs4GzgZYu3ZtTUxMTG+y2953/iWcfuPwv7u+44SJ3V5ncnKShTgGw2L+wzXO+Y9z7mD+i2kxL2f9EI+8WX8LcHhV/QLwZdo3rEkOo7ts55ltnT9JsleSvYD303WmhwGvaW0B3gOc0QYZuJeuAKW931tVTwfOaO0kSRonr+GhS1kBNgNTI6xuAC4ZiJ/YRmk9Gri/Xe56GXBskv3bgDrHApe1ZQ8kObqNynriwLYkSepl0YrIqvoMsH1a7FNVNXUty5U89G3oeuCCqvpBVX0V2Eo3mtyRwNaqur2qfkh35nF96/heCFzc1p8+yMDU4AMXA8c4fLkkaVwkeTzwK8BHB8LvBn4lyW1t2btb/FLgdrp+838A/w6gqrYD7wSubq93tBjA64EPtnW+AnxiMfdHkrT8DPO6kl8HLmzTB9MVlVMGb/SfPjDAUcBTgPsGCtLB9j8eTKCqdia5v7X/1kLvgCRJC62qvkfXbw3Gvk03Wuv0tgWcPMt2NgGbZohfAxy+IMlKkh6VhlJEJnkbsBM4fyo0Q7Ni5jOlcw0M0GvQgJbHgg4cMCqDBsDuDxwwyjfu7sq45g3mPgzjmjeYuyRJGh1LXkQm2UA34M4x7RtUmH1gAGaJf4vuWVgr2tnIwfZT29qWZAXwZKZdVjtloQcOGJVBA2D3Bw4Y5Rt3d2Vc8wZzH4ZxzRvMXZIkjY4lfU5kG2n1LcDL2+U6UzYDxyd5bBt1dQ3wObr7ONYkObQNd348sLkVn1cAr2zrTx9kYGrwgVcCnx4oViVJkiRJ87CYj/j4CN3w4gcm2QacSjca62OBLW2smyur6v+tqpuTXATcQneZ68lV9WDbzhvoRpnbC9hUVTe3j3gLcEGSdwGfB85p8XOADyfZSncG8vjF2kdJkiRJerRZtCKyql4zQ/icGWJT7U8DTpshfind6HPT47fTjd46Pf594FW7lawkSZIkqZclvZxVkiRJkjTeLCIlSZIkSb1ZREqSJEmSerOIlCRJkiT1ZhEpSZIkSerNIlKSJEmS1JtFpCRJkiSpN4tISZIkSVJvFpGSJEmSpN4sIiVJkiRJvVlESpIkSZJ6s4iUJEmSJPVmESlJkiRJ6s0iUpIkSZLUm0WkJEmSJKk3i0hJkiRJUm8WkZIkjZAk+yW5OMkXk9ya5BeTHJBkS5Lb2vv+rW2SnJlka5IbkhwxsJ0Nrf1tSTYMxJ+X5Ma2zplJMoz9lCSNL4tISZJGy3uBT1bVzwHPBm4FTgEur6o1wOVtHuA4YE17bQTOAkhyAHAqcBRwJHDqVOHZ2mwcWG/dEuyTJGkZsYiUJGlEJNkX+GXgHICq+mFV3QesB85tzc4FXtGm1wPnVedKYL8kBwEvBrZU1faquhfYAqxry/atqs9WVQHnDWxLkqReVgw7AUmS9GNPA74J/GmSZwPXAm8CVlbV3QBVdXeSp7b2BwN3Dqy/rcV2Fd82Q/xhkmykO1vJypUrmZycnPeOrdwH3vysnfPeznztyb7s2LFjQY7BsJj/cI1z/uOcO5j/YrKIlCRpdKwAjgB+s6quSvJeHrp0dSYz3c9YexB/eKDqbOBsgLVr19bExMQcac/tfedfwuk3Dv/PjjtOmNjtdSYnJ1mIYzAs5j9c45z/OOcO5r+YvJxVkqTRsQ3YVlVXtfmL6YrKb7RLUWnv9wy0P2Rg/VXAXXPEV80QlySpN4tISZJGRFX9PXBnkme00DHALcBmYGqE1Q3AJW16M3BiG6X1aOD+dtnrZcCxSfZvA+ocC1zWlj2Q5Og2KuuJA9uSJKmX4V9XIkmSBv0mcH6SvYHbgdfRfel7UZKTgK8Br2ptLwVeAmwFvtfaUlXbk7wTuLq1e0dVbW/Trwc+BOwDfKK9JEnqzSJSkqQRUlXXA2tnWHTMDG0LOHmW7WwCNs0QvwY4fJ5pSpIexRbtctYkm5Lck+SmgdiiPyx5ts+QJEmSJM3fYt4T+SEe+QDjpXhY8myfIUmSJEmap0UrIqvqM8D2aeGleFjybJ8hSZIkSZqnpb4ncikeljzbZzzCQj9MeVQepAy7/zDlUX6Y6a6Ma95g7sMwrnmDuUuSpNExKgPrLMrDkuey0A9THpUHKcPuP0x5lB9muivjmjeY+zCMa95g7pIkaXQs9XMil+JhybN9hiRJkiRpnpa6iFyKhyXP9hmSJEmSpHlatGsvk3wEmAAOTLKNbpTVd7P4D0ue7TMkSZIkSfO0aEVkVb1mlkWL+rDkqvr2TJ8hSZIkSZq/pb6cVZIkSZI0xiwiJUmSJEm9WURKkiRJknqziJQkSZIk9WYRKUmSJEnqzSJSkiRJktRbr0d8JLkC+Azwf4C/rarvLWpWkiSNOftOSdJy1fdM5P8D/B1wAnBNkquS/NfFS0uSpLFn3ylJWpZ6nYmsqi8nuQ/4Tnu9GHjuYiYmSdI4s++UJC1Xvc5EJvkS8JfATwPnA4dX1YsWMzFJksaZfackabnqeznr2cBdwCuBjcBrkvz0omUlSdL4s++UJC1LvYrIqjq9qv4FcAzwBeBdwO2LmZgkSeNsT/vOJHckuTHJ9UmuabEDkmxJclt737/Fk+TMJFuT3JDkiIHtbGjtb0uyYSD+vLb9rW3dLPS+S5KWt76Xs74nyd8A1wFrgXcAP7+YiUmSNM7m2Xf+86p6TlWtbfOnAJdX1Rrg8jYPcBywpr02Ame1zz4AOBU4CjgSOHWq8GxtNg6st26Pd1KS9KjUa2Ad4HrgzKr6+mImI0nSMrKQfed6YKJNnwtMAm9p8fOqqoArk+yX5KDWdktVbQdIsgVYl2QS2LeqPtvi5wGvAD6xADlKkh4l+o7O+pEkL0nymy30v6vKDkeSpFnMo+8s4FNJCvjvVXU2sLKq7m7bvTvJU1vbg4E7B9bd1mK7im+bIS5JUm+9isgk7wJeAPxZC/37JM+vqv+4aJlJkjTG5tF3Pr+q7mqF4pYkX9zVx8wQqz2IP3yjyUa6S15ZuXIlk5OTc6Q8t5X7wJuftXPe25mvPdmXHTt2LMgxGBbzH65xzn+ccwfzX0x9L2d9OfDcqnoQIMkmuns8LCIlSZrZHvWdVXVXe78nycfo7mn8RpKD2lnIg4B7WvNtwCEDq6+iGxF2Gw9d/joVn2zxVTO0n57D2XSjy7J27dqamJiY3mS3ve/8Szj9xr5/diyeO06Y2O11JicnWYhjMCzmP1zjnP845w7mv5j6PuIDYN+B6SctdCKSJC1Du9V3JnlCkidNTQPHAjcBm4GpEVY3AJe06c3AiW2U1qOB+9tlr5cBxybZvw2ocyxwWVv2QJKj26isJw5sS5KkXvp+JfhfgOuSXE53KcwE8PbFSkqSpGVgT/rOlcDH2lM3VgB/VlWfTHI1cFGSk4CvAa9q7S8FXgJsBb4HvA6gqrYneSdwdWv3jqlBdoDXAx8C9qEbUMcxDiRJu2XOIrJ9U3k5cAXdUOEB3u5IrZIkzWxP+86quh149gzxb9M9b3J6vICTZ9nWJmDTDPFrgMPn3gtJkmY2ZxFZVZXk41X1POCjS5CTJEljzb5TkrSc9b0n8nNJjljUTCRJWl7sOyVJy1LfeyJfAPzbJF8Bvkt3WU5VlZ2jJEkzs++UJC1LfYvIVyxqFpIkLT/2nZKkZanPwDp7AR+tqkfc6C9Jkh7JvlOStJzNeU9ke0jyLUkOXqgPTfLbSW5OclOSjyR5XJJDk1yV5LYkFybZu7V9bJvf2pavHtjOW1v8S0lePBBf12Jbk5yyUHlLktTHYvSdkiSNir6Xsx4I3Jrks3T3dQBQVf9ydz+wdahvBA6rqn9IchFwPN1zrs6oqguSfAA4CTirvd9bVU9PcjzwHuDVSQ5r6z0T+CngfyX52fYx7wd+BdgGXJ1kc1Xdsru5SpI0DwvWd0qSNEr6FpHvXoTP3SfJPwKPB+4GXgj867b8XOD36YrI9W0a4GLgj9vzt9YDF1TVD4CvJtkKHNnabW3P2iLJBa2tRaQkaSktdN8pSdJI6FVEVtXlSQ4E1rbQNVX1rT35wKr6epL/BnwN+AfgU8C1wH1VtbM12wZMXQJ0MHBnW3dnkvuBp7T4lQObHlznzmnxo2bKJclGYCPAypUrmZyc3JNd+rGV+8Cbn7Vz7oZLYHf3ZceOHfPe/2EY17zB3IdhXPMGcx9HC9l3SpI0SnoVkUn+FXAG8H/ohij/QJLfrqqP7e4HJtmf7szgocB9wJ8Dx83QtKZWmWXZbPGZ7vOsGWJU1dnA2QBr166tiYmJXaU+p/edfwmn39j35O7iuuOEid1qPzk5yXz3fxjGNW8w92EY17zB3MfRQvadkiSNkr4Vz9uBf1ZV3wBIspLuDOKedIQvAr5aVd9s2/oo8EvAfklWtLORq4C7WvttwCHAtiQrgCcD2wfiUwbXmS0uSdJSWci+U5KkkTHn6KxT7aY6weabu7HudF8Djk7y+HZv4zF09yteAbyytdkAXNKmN7d52vJPV1W1+PFt9NZDgTXA54CrgTVttNe96Qbf2byHuUqStKcWsu+UJGlk9D0T+akklwJ/1uaPp/s2dbdV1VVJLgauA3YCn6e7pPSvgAuSvKvFzmmrnAN8uA2cs719NlV1cxvZ9Za2nZPbkOokeQNwGbAXsKmqbt6TXCVJmocF6zslSRolfYvI3wV+DXg+3X0d59KNlLpHqupU4NRp4dt5aHTVwbbfB141y3ZOA06bIX4pcOme5idJ0gJY0L5TkqRR0Xd01gIuTPKXA+s8CfjOYiUmSdI4s++UJC1XfUdn/Q3gncCDwI/ovlEt4J8uXmqSJI0v+05J0nLV93LWtwDPrqp7FjMZSZKWEftOSdKy1HeUuNvx8htJknaHfackaVnqeybyFOBvklwJ/GAqWFW/syhZSZI0/uw7JUnLUt8i8gPA3wA30t3XIUmSds2+U5K0LPUtIn9UVW9c1EwkSVpe7DslSctS33siL0/y60l+Msm+U69FzUySpPG2x31nkr2SfD7Jx9v8oUmuSnJbkguT7N3ij23zW9vy1QPbeGuLfynJiwfi61psa5JTFnaXJUmPBn3PRG5o738wEHOYckmSZjefvvNNwK3AVNH5HuCMqrogyQeAk4Cz2vu9VfX0JMe3dq9OchhwPPBM4KeA/5XkZ9u23g/8CrANuDrJ5qq6ZU93UpL06NPrTGRVHTLDywJSkqRZ7GnfmWQV8FLgg20+wAuBi1uTc4FXtOn1bZ62/JjWfj1wQVX9oKq+CmwFjmyvrVV1e1X9ELigtZUkqbdeZyKTrAA2Ar/cQpPAB6tq5yLlJUnSWJtH3/lHwO8BT2rzTwHuG1hvG3Bwmz4YuBOgqnYmub+1Pxi4cmCbg+vcOS1+VP+9kiSp/+Ws7weeAGxq8/83cARd5yhJkh5pt/vOJC8D7qmqa5NMTIVnaFpzLJstPtMVSDU9kGTjVJ4rV65kcnJytpR7W7kPvPlZw//ueU/2ZceOHQtyDIbF/IdrnPMf59zB/BdT3yLy6Kp69sD8p5J8YTESkiRpmdiTvvP5wMuTvAR4HN09kX8E7JdkRTsbuQq4q7XfBhwCbGtnPp8MbB+ITxlcZ7b4j1XV2cDZAGvXrq2JiYk50p7b+86/hNNv7Ptnx+K544SJ3V5ncnKShTgGw2L+wzXO+Y9z7mD+i6nv6Kw/mjbi22p85pUkSbuy231nVb21qlZV1Wq6gXE+XVUnAFcAr2zNNgCXtOnNPDSAzytb+2rx49vorYcCa4DPAVcDa9por3u3z9g8v92UJD3a9P1K8PeAzyT5Mt0lMk+nGxFOkiTNbCH7zrcAFyR5F/B54JwWPwf4cJKtdGcgjweoqpuTXATcAuwETq6qBwGSvAG4DNgL2FRVN+9hTpKkR6ldFpFJjq6qK6tqS5JnAD9P1xHeUlX/sCQZSpI0Rhaq76yqSbrBeKiq2+lGVp3e5vvAq2ZZ/zTgtBnilwKX9s1DkqTp5joT+Sd0gwDQOr7rFj0jSZLGm32nJGlZ63tPpCRJkiRJc56JfFqSWW+4r6qXL3A+kiSNO/tOSdKyNlcR+U3g9KVIRJKkZcK+U5K0rM1VRD5QVf97STKRJGl5sO+UJC1rc90TecdSJCFJ0jJyx7ATkCRpMe3yTGRV/cup6SS/BKweXKeqzlu0zCRJGkP2nZKk5W6uy1kBSPJh4GeA64EHW7gAO0JJkmZg3ylJWq56FZHAWuCwqqqF+NAk+wEfBA6n61B/HfgScCHdN7Z3AL9WVfcmCfBe4CXA94DXVtV1bTsbgP/YNvuuqjq3xZ8HfAjYh+6Bym9aqNwlSeppQftOSZJGRd/nRN4E/JMF/Nz3Ap+sqp8Dng3cCpwCXF5Va4DL2zzAccCa9toInAWQ5ADgVOAo4Ejg1CT7t3XOam2n1lu3gLlLktTHQvedkiSNhL5nIg8EbknyOeAHU8E9edZVkn2BXwZe27bxQ+CHSdYDE63ZucAk8BZgPXBe+yb3yiT7JTmotd1SVdvbdrcA65JMAvtW1Wdb/DzgFcAndjdXSZLmYcH6TkmSRknfIvL3F/Azn0b3DK0/TfJs4FrgTcDKqroboKruTvLU1v5g4M6B9be12K7i22aIS5K0lH5/2AlIkrQYehWRC/y8qxXAEcBvVtVVSd7LQ5euziQzpbQH8UduONlId9krK1euZHJychdpzG3lPvDmZ+2c1zYWyu7uy44dO+a9/8MwrnmDuQ/DuOYN5j6OfFakJGm52mURmeSvq+oFSR7g4YVYgKqqfffgM7cB26rqqjZ/MV0R+Y0kB7WzkAcB9wy0P2Rg/VXAXS0+MS0+2eKrZmj/CFV1NnA2wNq1a2tiYmKmZr297/xLOP3Gvid3F9cdJ0zsVvvJyUnmu//DMK55g7kPw7jmDeY+Thap75QkaWTscmCdqnpBe39SVe078HrSnnaCVfX3wJ1JntFCxwC3AJuBDS22AbikTW8GTkznaOD+dtnrZcCxSfZvA+ocC1zWlj2Q5Og2suuJA9uSJGlRLUbfKUnSKNmt02btPsXHTc1X1df28HN/Ezg/yd7A7cDr6Arai5KcBHwNeFVreynd4z220j3i43Xts7cneSdwdWv3jqlBdoDX89AjPj6Bg+pIkoZkAftOSZJGQq8iMsnLgdOBn6K7zPSn6R7L8cw9+dCqup7u+VnTHTND2wJOnmU7m4BNM8SvoXsGpSRJQ7HQfackSaOi73Mi3wkcDXy5qg6lK/b+ZtGykiRp/Nl3SpKWpb5F5D9W1beBn0jyE1V1BfCcRcxLkqRxZ98pSVqW+t4TeV+SJwKfobuX8R5gNJ5lIUnSaLLvlCQtS33PRK6nG9Tmt4FPAl8BfnWxkpIkaRmw75QkLUu9isiq+m5V/aiqdlbVucD7gXWLm5okSeNrT/rOJI9L8rkkX0hyc5I/aPFDk1yV5LYkF7bRzUny2Da/tS1fPbCtt7b4l5K8eCC+rsW2JjllMfZdkrS87bKITLJv64T+OMmx7VmNb6B7LMevLU2KkiSNj3n2nT8AXlhVz6a7f3Jde0bye4AzqmoNcC9wUmt/EnBvVT0dOKO1I8lhwPF0I8GuA/4kyV5J9qIrZo8DDgNe09pKktTbXGciPww8A7gR+A3gU3TPb1xfVesXOTdJksbRHved1dnRZh/TXgW8ELi4xc8FXtGm17d52vJjkqTFL6iqH1TVV+metXxke22tqtur6ofABa2tJEm9zTWwztOq6lkAST4IfAv4p1X1wKJnJknSeJpX39nOFl4LPJ3urOFXgPuqampQnm3AwW36YOBOgKrameR+4CktfuXAZgfXuXNa/KgZctgIbARYuXIlk5OTfVLfpZX7wJufNfxxhfZkX3bs2LEgx2BYzH+4xjn/cc4dzH8xzVVE/uPURFU9mOSrFpCSJO3SvPrOqnoQeE6S/YCPAT8/U7P2nlmWzRaf6QqkekSg6mzgbIC1a9fWxMTE3InP4X3nX8LpN/YdFH7x3HHCxG6vMzk5yUIcg2Ex/+Ea5/zHOXcw/8U012/zZyf5TpsOsE+bD91VN/suanaSJI2fBek7q+q+JJPA0cB+SVa0s5GrgLtas23AIcC2JCuAJwPbB+JTBteZLS5JUi+7vCeyqvaqqn3b60lVtWJg2gJSkqRp5tN3JvnJdgaSJPsALwJuBa4AXtmabQCjsdBmAAAgAElEQVQuadOb2zxt+aerqlr8+DZ666HAGuBzwNXAmjba6950g+9sXqh9lyQ9Ogz/uhJJkjTlIODcdl/kTwAXVdXHk9wCXJDkXcDngXNa+3OADyfZSncG8niAqro5yUXALcBO4OR2mSxtpNjLgL2ATVV189LtniRpObCIlCRpRFTVDcBzZ4jfTjey6vT49+lGfp1pW6cBp80QvxS4dN7JSpIeteZ6xIckSZIkST9mESlJkiRJ6s0iUpIkSZLUm0WkJEmSJKk3i0hJkiRJUm8WkZIkSZKk3iwiJUmSJEm9WURKkiRJknqziJQkSZIk9WYRKUmSJEnqzSJSkiRJktSbRaQkSZIkqbehFZFJ9kry+SQfb/OHJrkqyW1JLkyyd4s/ts1vbctXD2zjrS3+pSQvHoiva7GtSU5Z6n2TJEmSpOVqmGci3wTcOjD/HuCMqloD3Auc1OInAfdW1dOBM1o7khwGHA88E1gH/EkrTPcC3g8cBxwGvKa1lSRJkiTN01CKyCSrgJcCH2zzAV4IXNyanAu8ok2vb/O05ce09uuBC6rqB1X1VWArcGR7ba2q26vqh8AFra0kSZIkaZ6GdSbyj4DfA37U5p8C3FdVO9v8NuDgNn0wcCdAW35/a//j+LR1ZotLkiRJkuZpxVJ/YJKXAfdU1bVJJqbCMzStOZbNFp+pMK4ZYiTZCGwEWLlyJZOTk7Mn3sPKfeDNz9o5d8MlsLv7smPHjnnv/zCMa95g7sMwrnmDuUuSpNGx5EUk8Hzg5UleAjwO2JfuzOR+SVa0s42rgLta+23AIcC2JCuAJwPbB+JTBteZLf4wVXU2cDbA2rVra2JiYl479r7zL+H0G4dxSB/pjhMmdqv95OQk893/YRjXvMHch2Fc8wZzlyRJo2PJL2etqrdW1aqqWk03MM6nq+oE4Argla3ZBuCSNr25zdOWf7qqqsWPb6O3HgqsAT4HXA2saaO97t0+Y/MS7JokSZIkLXujcdqs8xbggiTvAj4PnNPi5wAfTrKV7gzk8QBVdXOSi4BbgJ3AyVX1IECSNwCXAXsBm6rq5iXdE0mSJElapob5iA+qarKqXtamb6+qI6vq6VX1qqr6QYt/v80/vS2/fWD906rqZ6rqGVX1iYH4pVX1s23ZaUu/Z5Ik7b4khyS5IsmtSW5O8qYWPyDJlvYs5S1J9m/xJDmzPRf5hiRHDGxrQ2t/W5INA/HnJbmxrXNmG/FckqTehlpESpKkh9kJvLmqfh44Gji5Pev4FODy9izly9s8dM9EXtNeG4GzoCs6gVOBo+gefXXqVOHZ2mwcWG/dEuyXJGkZsYiUJGlEVNXdVXVdm34AuJXuMVWDz0ye/izl86pzJd0gdQcBLwa2VNX2qroX2AKsa8v2rarPtvEFzhvYliRJvVhESpI0gpKsBp4LXAWsrKq7oSs0gae2Zrv7zOSD2/T0uCRJvY3SwDqSJAlI8kTgL4Dfqqrv7OK2xd19lvKunss8+PkL+hxlGJ1nKe/Jvoz7s07Nf7jGOf9xzh3MfzFZREqSNEKSPIaugDy/qj7awt9IclBV3d0uSb2nxWd7ZvI2YGJafLLFV83Q/mEW+jnKMDrPUt7d5yjD+D/r1PyHa5zzH+fcwfwXk5ezSpI0ItpIqecAt1bVHw4sGnxm8vRnKZ/YRmk9Gri/Xe56GXBskv3bgDrHApe1ZQ8kObp91okD25IkqZfhfyUoSZKmPB/4N8CNSa5vsf8AvBu4KMlJwNeAV7VllwIvAbYC3wNeB1BV25O8E7i6tXtHVW1v068HPgTsA3yivSRJ6s0iUpKkEVFVf83M9y0CHDND+wJOnmVbm4BNM8SvAQ6fR5qSpEc5L2eVJEmSJPVmESlJkiRJ6s0iUpIkSZLUm0WkJEmSJKk3i0hJkiRJUm8WkZIkSZKk3iwiJUmSJEm9WURKkiRJknqziJQkSZIk9WYRKUmSJEnqzSJSkiRJktSbRaQkSZIkqTeLSEmSJElSbxaRkiRJkqTeLCIlSZIkSb1ZREqSJEmSerOIlCRJkiT1tuRFZJJDklyR5NYkNyd5U4sfkGRLktva+/4tniRnJtma5IYkRwxsa0Nrf1uSDQPx5yW5sa1zZpIs9X5KkiRJ0nI0jDORO4E3V9XPA0cDJyc5DDgFuLyq1gCXt3mA44A17bUROAu6ohM4FTgKOBI4darwbG02Dqy3bgn2S5IkSZKWvSUvIqvq7qq6rk0/ANwKHAysB85tzc4FXtGm1wPnVedKYL8kBwEvBrZU1faquhfYAqxry/atqs9WVQHnDWxLkiRJkjQPQ70nMslq4LnAVcDKqrobukITeGprdjBw58Bq21psV/FtM8QlSZIkSfO0YlgfnOSJwF8Av1VV39nFbYszLag9iM+Uw0a6y15ZuXIlk5OTc2S9ayv3gTc/a+e8trFQdndfduzYMe/9H4ZxzRvMfRjGNW8w90eLJJuAlwH3VNXhLXYAcCGwGrgD+LWqurfd7/9e4CXA94DXTl3p08YJ+I9ts++qqnNb/HnAh4B9gEuBN7WrdiRJ6m0oRWSSx9AVkOdX1Udb+BtJDqqqu9slqfe0+DbgkIHVVwF3tfjEtPhki6+aof0jVNXZwNkAa9eurYmJiZma9fa+8y/h9BuHVpc/zB0nTOxW+8nJSea7/8MwrnmDuQ/DuOYN5v4o8iHgj+luxZgyNWbAu5Oc0ubfwsPHDDiKbjyAowbGDFhL9yXqtUk2t1s/psYMuJKuiFwHfGIJ9kuStIwMY3TWAOcAt1bVHw4s2gxMjbC6AbhkIH5iG6X1aOD+drnrZcCxSfZvA+ocC1zWlj2Q5Oj2WScObEuSpJFVVZ8Btk8LO2aAJGmkDOO02fOBfwPcmOT6FvsPwLuBi5KcBHwNeFVbdindpTpb6S7XeR1AVW1P8k7g6tbuHVU11fG+nocu1/kEfssqSRpfDxszIIljBkiShmrJi8iq+mtmvm8R4JgZ2hdw8izb2gRsmiF+DXD4PNKUJGnUjc2YATA64wbsyb6M+3295j9c45z/OOcO5r+YRuMGPkmSNJuxHzMARmfcgN0dMwDG/75e8x+ucc5/nHMH819MQ33EhyRJmpNjBkiSRsrwvxKUJEkAJPkI3VnEA5Nsoxtl1TEDJEkjxSJSkqQRUVWvmWWRYwZIkkaGl7NKkiRJknqziJQkSZIk9WYRKUmSJEnqzSJSkiRJktSbRaQkSZIkqTeLSEmSJElSbxaRkiRJkqTeLCIlSZIkSb1ZREqSJEmSerOIlCRJkiT1ZhEpSZIkSerNIlKSJEmS1JtFpCRJkiSpN4tISZIkSVJvFpGSJEmSpN4sIiVJkiRJvVlESpIkSZJ6s4iUJEmSJPVmESlJkiRJ6m3FsBOQJElaKqtP+avdXufNz9rJa/dgvbnc8e6XLvg2JWkpeCZSkiRJktTbsi0ik6xL8qUkW5OcMux8JEkaFfaRkqT5WJaXsybZC3g/8CvANuDqJJur6pbhZrZ0dvdyHS/VkaRHB/tISdJ8LdczkUcCW6vq9qr6IXABsH7IOUmSNArsIyVJ87Isz0QCBwN3DsxvA46a3ijJRmBjm92R5Evz/NwDgW/NcxtD8cZFyj3vWegtPsLYHnPMfRjGNW8w94X008NOYMjm7CMXoX+E0fs56G2M+8gpY3vsG/MfnnHOHcx/T/TqI5drEZkZYvWIQNXZwNkL9qHJNVW1dqG2t5TGNfdxzRvMfRjGNW8wdy2oOfvIhe4fYbx/DsY5dzD/YRvn/Mc5dzD/xbRcL2fdBhwyML8KuGtIuUiSNErsIyVJ87Jci8irgTVJDk2yN3A8sHnIOUmSNArsIyVJ87IsL2etqp1J3gBcBuwFbKqqm5fgoxf00p8lNq65j2veYO7DMK55g7lrgdhH7pFxzh3Mf9jGOf9xzh3Mf9Gk6hG3CkqSJEmSNKPlejmrJEmSJGkRWERKkiRJknqziFwgSdYl+VKSrUlOGXY+u5LkjiQ3Jrk+yTUtdkCSLUlua+/7DztPgCSbktyT5KaB2Iy5pnNm+ze4IckRw8t81tx/P8nX27G/PslLBpa9teX+pSQvHk7WkOSQJFckuTXJzUne1OIjf9x3kftIH/ckj0vyuSRfaHn/QYsfmuSqdswvbIOgkOSxbX5rW756GHnPkfuHknx14Jg/p8VH5udFS2Oc+kfY/d+BoyjJXkk+n+TjbX7G3yWjKMl+SS5O8sX2b/CLY3bsf7v93NyU5CPtd+TIHv9Z/lYZ+f5+INeZ8v+v7efnhiQfS7LfwLKh9/kDuTwi94Flv5ukkhzY5kfu2FNVvub5ohuY4CvA04C9gS8Ahw07r13kewdw4LTYfwFOadOnAO8Zdp4tl18GjgBumitX4CXAJ+iegXY0cNUI5v77wO/O0Paw9nPzWODQ9vO015DyPgg4ok0/Cfhyy2/kj/such/p496O3RPb9GOAq9qxvAg4vsU/ALy+Tf874ANt+njgwiEe89ly/xDwyhnaj8zPi68l+fkYq/6x5bxbvwNH8QX8DvBnwMfb/Iy/S0bxBZwL/Eab3hvYb1yOPXAw8FVgn4Hj/tpRPv6M8d9Zu8j/WGBFm37PQP4j0efvKvcWP4Ru4LO/o/29PorH3jORC+NIYGtV3V5VPwQuANYPOafdtZ7uFzft/RVDzOXHquozwPZp4dlyXQ+cV50rgf2SHLQ0mT7SLLnPZj1wQVX9oKq+Cmyl+7laclV1d1Vd16YfAG6l6xhH/rjvIvfZjMRxb8duR5t9THsV8ELg4haffsyn/i0uBo5JMtMD5BfdLnKfzcj8vGhJjF3/uAe/A0dKklXAS4EPtvkw+++SkZJkX7o/rM8BqKofVtV9jMmxb1YA+yRZATweuJsRPv7j/HcWzJx/VX2qqna22SvpnoULI9LnT9nF34lnAL/Hw/vSkTv2FpEL42DgzoH5bez6D9dhK+BTSa5NsrHFVlbV3dB1oMBTh5bd3GbLdVz+Hd7QLkXYNHBJzkjm3i6TfC7d2aWxOu7TcocRP+7t8rPrgXuALXTfkN430BEO5vbjvNvy+4GnLG3GD5mee1VNHfPT2jE/I8ljW2xkjrmWxFj/e/f8HThq/ojuD9AftfmnMPvvklHzNOCbwJ+2y3E/mOQJjMmxr6qvA/8N+Bpd8Xg/cC3jc/ynjFV/P4dfpzuDB2OQf5KXA1+vqi9MWzRyuVtELoyZzgCM8rNTnl9VRwDHAScn+eVhJ7RAxuHf4SzgZ4Dn0HUwp7f4yOWe5InAXwC/VVXf2VXTGWKjlvvIH/eqerCqnkP3jemRwM/P1Ky9j0ze8MjckxwOvBX4OeCfAQcAb2nNRyp3Lbqx/ffejd+BIyPJy4B7qurawfAMTUf132AF3eV9Z1XVc4Hv0l1OORbaF5Tr6S6V/CngCXR/a003qsd/LuP0s0SStwE7gfOnQjM0G5n8kzweeBvw9pkWzxAbau4WkQtjG931y1NWAXcNKZc5VdVd7f0e4GN0f7B+Y+q0eHu/Z3gZzmm2XEf+36GqvtH+4P4R8D946DKKkco9yWPo/ng6v6o+2sJjcdxnyn1cjjtAu3Rrku6eh/3aJVHw8Nx+nHdb/mT6Xzq9aAZyX9cuCayq+gHwp4zwMdeiGst/7938HThKng+8PMkddJcOv5DuzORsv0tGzTZg28DVDBfTFZXjcOwBXgR8taq+WVX/CHwU+CXG5/hPGYv+fleSbABeBpxQVVPF1qjn/zN0X0B8of0fXgVcl+SfMIK5W0QujKuBNW30rb3pBrrYPOScZpTkCUmeNDVNd/PxTXT5bmjNNgCXDCfDXmbLdTNwYhvB6mjg/qnLMUbFtOvX/wXdsYcu9+PTjbp5KLAG+NxS5wc/vn/mHODWqvrDgUUjf9xny33Uj3uSn5waPS7JPnR/iNwKXAG8sjWbfsyn/i1eCXx6oJNcUrPk/sWBP0BCdz/N4DEfiZ8XLYmx6R+n7MHvwJFRVW+tqlVVtZruWH+6qk5g9t8lI6Wq/h64M8kzWugY4BbG4Ng3XwOOTvL49nM0lf9YHP8BI9/f70qSdXRXv7y8qr43sGgk+vzZVNWNVfXUqlrd/g9voxvk6+8ZxWNfQx7ZZ7m86EZN+jLdfUxvG3Y+u8jzaXQjU30BuHkqV7p7Ji4HbmvvBww715bXR+guP/xHuv9MJ82WK92p/ve3f4MbgbUjmPuHW2430P1COGig/dta7l8Cjhti3i+gu0TiBuD69nrJOBz3XeQ+0scd+AXg8y2/m4C3t/jT6Dq4rcCfA49t8ce1+a1t+dOGeMxny/3T7ZjfBPx/PDSC68j8vPhasp+RsegfB/Ldrd+Bo/oCJnhodNYZf5eM4ovutoNr2vH/n8D+43TsgT8Avth+932YbiTQkT3+jPHfWbvIfyvd/YNT/38/MNB+6H3+rnKftvwOHhqddeSOfVpikiRJkiTNyctZJUmSJEm9WURKkiRJknqziJQkSZIk9WYRKUmSJEnqzSJSkiRJktSbRaQ0hpI8mOT6JDcl+cup5/TNsc7f9mjzfyW5uW17n12029HeVye5abZ2kiQthIF+b+p1yrBzGpTkOUleMjD/8lHLUVpIPuJDGkNJdlTVE9v0ucCXq+q0BdjuB4CrqupP+3x+ktV0zyE7fL6fLUnSbAb7vSHmsKKqds6y7LV0z+57w9JmJQ2HZyKl8fdZ4GCAJE9McnmS65LcmGT9VKOBs4cTSSaTXJzki0nOT+c3gF8D3t5is25LkqRhS3JckosG5ieS/GWbPivJNe3qmj8YaHNHkvck+Vx7Pb3Ff7r1eTe093/a4h9K8odJrgDek+TIJH+b5PPt/RlJ9gbeAby6nSV9dZLXJvnjHts+s23n9iSvXLKDJ83TimEnIGnPJdkLOAY4p4W+D/yLqvpOkgOBK5NsrkdecvBc4JnAXcDfAM+vqg8meQHdmcWLk6zouS1JkhbbPkmuH5j/z8BfAP89yROq6rvAq4EL2/K3VdX21k9enuQXquqGtuw7VXVkkhOBPwJeBvwxcF5VnZvk14EzgVe09j8LvKiqHkyyL/DLVbUzyYuA/1RV/yrJ2xk4E9nOTE7Z1bYPAl4A/BywGbh4AY6VtOg8EymNp6nO9NvAAcCWFg/wn5LcAPwvujOUK2dY/3NVta2qfgRcD6yeoU3fbUmStNj+oaqeM/C6sF1a+kngV9sXny8FLmntfy3JdcDn6b40PWxgWx8ZeP/FNv2LwJ+16Q/TFXZT/ryqHmzTTwb+vI0HcEbb9lx2te3/WVU/qqpbsI/VGLGIlMbTP1TVc4CfBvYGTm7xE4CfBJ7Xln8DeNwM6/9gYPpBZr4qoe+2JEkalgvpbsV4IXB1VT2Q5FDgd4FjquoXgL/i4f1XzTLNLPHvDky/E7iijQXwq+xZvzi47cH+OHuwLWkoLCKlMVZV9wNvBH43yWPoviG9p6r+Mck/pysy99RCbkuSpMUwCRwB/FseupR1X7rC7/4kK4Hjpq3z6oH3z7bpvwWOb9MnAH89y+c9Gfh6m37tQPwB4EmzrNN329LY8J5IacxV1eeTfIGugzof+Msk19BdpvrFeWx6IbclSdJ8TL8n8pNVdUq7T/HjdAXdBoCq+kKSzwM3A7fT3fs/6LFJrqI7mfKaFnsjsCnJvwe+Cbxuljz+C3Bukt8BPj0QvwI4peX4n6et03fb0tjwER+SJEl6VEhyB90AON8adi7SOPNyVkmSJElSb56JlCRJkiT15plISZIkSVJvFpGSJEmSpN4sIiVJkiRJvVlESpIkSZJ6s4iUJEmSJPVmESlJkiRJ6s0iUpIkSZLUm0WkJEmSJKk3i0hJkiRJUm8WkZIkSZKk3iwiJUmSJEm9WURKkiRJknqziJQkSZIk9WYRKUmSJEnqzSJSkiRJktSbRaQkSZIkqTeLSEmSJElSbyuGncCoOPDAA2v16tXz2sZ3v/tdnvCEJyxMQiNiOe4TLM/9cp/Gw3LcJxiv/br22mu/VVU/Oew8xsVC9I8wXj8jo8ZjNz8evz3nsZufcTx+fftIi8hm9erVXHPNNfPaxuTkJBMTEwuT0IhYjvsEy3O/3KfxsBz3CcZrv5L83bBzGCcL0T/CeP2MjBqP3fx4/Pacx25+xvH49e0jvZxVkiRJktSbRaQkSZIkqTeLSEmSJElSbxaRkiRJkqTeLCIlSZIkSb1ZREqSJEmSerOIlCRJkiT1ZhEpSZIkSerNIlKSJEmS1NuKYSewnNz49ft57Sl/New0ALjj3S8ddgqSJI2c1SPST4N9taTx5ZlISZIkSVJvFpGSJEmSpN4sIiVJkiRJvVlESpIkSZJ6s4iUJEmSJPVmESlJkiRJ6s0iUvr/27v/eLvq+s73r7cgSrUU1HpKCW1oTVuRDIi5kNbePs6IhaBWaEcqXloCpTczXpzaTvojdHwMrT8eD5y5lKq1dDKQGrxU5FoZMgIiRU8dHX4qlAiIpJArKVSsASS1RYOf+8f+HtlNTsjO2TvnnL3yej4e53HW+qzv+u7vd+2TfPdnr7W+S5IkSdLATCIlSZIkSQMziZQkSZIkDcwkUpIkSZI0sP3n40WTHAxcAhwFFPBrwH3AR4HFwGbgl6vqsSQB3ge8DvgWcFZVfbHVsxJ4R6v23VW1vsVfBXwIOBC4Fnh7VdVc9G2hWLzmmpHUs3rpds4aoq7NF7x+JO2QJEmStDDM15nI9wGfrKqfAo4G7gXWADdW1RLgxrYOcDKwpP2sAi4GSPIi4HzgeOA44Pwkh7R9Lm5lp/dbMQd9kiRJkqTOm/MkMslBwM8BlwJU1ber6nHgFGB9K7YeOLUtnwJcVj03AwcnORQ4CbihqrZW1WPADcCKtu2gqrqpnX28rK8uSZIkSdIQ5uNM5I8BXwf+PMkdSS5J8gJgoqoeAWi/X9rKHwY81Lf/lhZ7tviWGeKSJEmSpCHNxz2R+wPHAv++qm5J8j6euXR1JpkhVrOI71xxsoreZa9MTEwwNTX1LM3YvYkDe/cQdsmwfRr2mO4t27ZtW7Btmy37NB662Cfobr8kSdLO5iOJ3AJsqapb2vrH6CWRX0tyaFU90i5JfbSv/OF9+y8CHm7xyR3iUy2+aIbyO6mqtcBagGXLltXk5ORMxQb2gcuv5sKN8zJX0V6zeun2ofq0+YzJ0TVmhKamphj2/V5o7NN46GKfoLv9kiRJO5vzy1mr6u+Bh5L8ZAudANwDbABWtthK4Oq2vAE4Mz3LgSfa5a7XAycmOaRNqHMicH3b9mSS5W1m1zP76pIkSZIkDWG+Tpv9e+DyJAcADwBn00tor0xyDvBV4LRW9lp6j/fYRO8RH2cDVNXWJO8Cbmvl3llVW9vyW3nmER/XtR9JkiRJ0pDmJYmsqjuBZTNsOmGGsgWcu4t61gHrZojfTu8ZlJIkSZKkEZqv50RKkqQZJNmcZGOSO5Pc3mIvSnJDkvvb70NaPEnen2RTkruSHNtXz8pW/v4kK/vir2r1b2r7zjQhnSRJu2QSKUnSwvOvq+qYqpq+amcNcGNVLQFu5JlZzU8GlrSfVcDF0Es6gfOB44HjgPOnE89WZlXffiv2fnckSV1iEilJ0sJ3CrC+La8HTu2LX1Y9NwMHtxnOTwJuqKqtVfUYcAOwom07qKpuareLXNZXlyRJA+nW8ygkSRp/BXwqSQH/tT2OaqLNPk57FNZLW9nDgIf69t3SYs8W3zJD/F8Y9XOUYeE8S3QhPc950OOxUI7duPL4zZ7HbjhdPn4mkZIkLSyvrqqHW6J4Q5IvP0vZme5nrFnE/2VgxM9RhoXzLNGz1lwz3034nkGfpbxQjt248vjNnsduOF0+fl7OKknSAlJVD7ffjwJX0bun8WvtUlTa70db8S3A4X27LwIe3k180QxxSZIGZhIpSdICkeQFSb5/ehk4EfgSsAGYnmF1JXB1W94AnNlmaV0OPNEue70eODHJIW1CnROB69u2J5Msb7OyntlXlyRJA/FyVkmSFo4J4Kr21I39gb+oqk8muQ24Msk5wFeB01r5a4HXAZuAbwFnA1TV1iTvAm5r5d5ZVVvb8luBDwEHAte1H0mSBmYSKUnSAlFVDwBHzxD/BnDCDPECzt1FXeuAdTPEbweOGrqxkqR9lpezSpIkSZIGZhIpSZIkSRqYSaQkSZIkaWAmkZIkSZKkgZlESpIkSZIGZhIpSZIkSRqYSaQkSZIkaWAmkZIkSZKkgZlESpIkSZIGZhIpSZIkSRqYSaQkSZIkaWD7z3cDJEmS9kWL11wzULnVS7dz1oBlZ2vzBa/fq/VL6hbPREqSJEmSBmYSKUmSJEkamEmkJEmSJGlgJpGSJEmSpIGZREqSJEmSBmYSKUmSJEkamEmkJEmSJGlg85JEJtmcZGOSO5Pc3mIvSnJDkvvb70NaPEnen2RTkruSHNtXz8pW/v4kK/vir2r1b2r7Zu57KUmSJEndM59nIv91VR1TVcva+hrgxqpaAtzY1gFOBpa0n1XAxdBLOoHzgeOB44DzpxPPVmZV334r9n53JEmSJKn7FtLlrKcA69vyeuDUvvhl1XMzcHCSQ4GTgBuqamtVPQbcAKxo2w6qqpuqqoDL+uqSJEmSJA1hvpLIAj6V5AtJVrXYRFU9AtB+v7TFDwMe6tt3S4s9W3zLDHFJkiRJ0pD2n6fXfXVVPZzkpcANSb78LGVnup+xZhHfueJeArsKYGJigqmpqWdt9O5MHAirl24fqo6FZtg+DXtM95Zt27Yt2LbNln0aD13sE3S3X5IkaWfzkkRW1cPt96NJrqJ3T+PXkhxaVY+0S1IfbcW3AIf37b4IeLjFJ3eIT7X4ohnKz9SOtcBagGXLltXk5ORMxQb2gcuv5sKN85WX7x2rl24fqk+bz5gcXWNGaGpqimHf74XGPo2HLvYJutsvSZK0szm/nDXJC5J8//QycCLwJWADMD3D6krg6ra8ATizzdK6HHiiXe56PXBikoUsvNsAACAASURBVEPahDonAte3bU8mWd5mZT2zry5JkiRJ0hDm47TZBHBVe+rG/sBfVNUnk9wGXJnkHOCrwGmt/LXA64BNwLeAswGqamuSdwG3tXLvrKqtbfmtwIeAA4Hr2o8kSZIkaUhznkRW1QPA0TPEvwGcMEO8gHN3Udc6YN0M8duBo4ZurCRJkiTpX1hIj/iQJEmSJC1wJpGSJEmSpIGZREqSJEmSBmYSKUmSJEkamEmkJEmSJGlgJpGSJC0wSfZLckeST7T1I5LckuT+JB9NckCLP6+tb2rbF/fVcV6L35fkpL74ihbblGTNXPdNkjT+TCIlSVp43g7c27f+XuCiqloCPAac0+LnAI9V1cuAi1o5khwJnA68AlgB/GlLTPcDPgicDBwJvKWVlSRpYCaRkiQtIEkWAa8HLmnrAV4DfKwVWQ+c2pZPaeu07Se08qcAV1TVU1X1ILAJOK79bKqqB6rq28AVrawkSQMziZQkaWH5Y+B3ge+29RcDj1fV9ra+BTisLR8GPATQtj/Ryn8vvsM+u4pLkjSw/ee7AZIkqSfJG4BHq+oLSSanwzMUrd1s21V8pi+Pa8dAklXAKoCJiQmmpqaeveED2LZt20jqGdbqpdt3X2iBmThw77d7Ibw3e8tC+dsbRx674XT5+JlESpK0cLwaeGOS1wHPBw6id2by4CT7t7ONi4CHW/ktwOHAliT7Az8AbO2LT+vfZ1fx76mqtcBagGXLltXk5OTQHZuammIU9QzrrDXXzHcT9tjqpdu5cOPe/ci2+YzJvVr/fFoof3vjyGM3nC4fPy9nlSRpgaiq86pqUVUtpjcxzqer6gzgM8CbWrGVwNVteUNbp23/dFVVi5/eZm89AlgC3ArcBixps70e0F5jwxx0TZLUIZ6JlCRp4fs94Iok7wbuAC5t8UuBDyfZRO8M5OkAVXV3kiuBe4DtwLlV9TRAkrcB1wP7Aeuq6u457YkkaeyZREqStABV1RQw1ZYfoDez6o5l/hk4bRf7vwd4zwzxa4FrR9hUSdI+xstZJUmSJEkDM4mUJEmSJA3MJFKSJEmSNDCTSEmSJEnSwEwiJUmSJEkDM4mUJEmSJA3MJFKSJEmSNDCTSEmSJEnSwPYftoIknwE+C/xP4H9V1beGbpUkSWPO8VGS1FWjOBP5b4H/DzgDuD3JLUn+ywjqlSRpnDk+SpI6aegzkVX1lSSPA99sPycBrxy2XkmSxpnjoySpq4Y+E5nkPuB/AD8KXA4cVVWvHbZeSZLGmeOjJKmrRnE561rgYeBNwCrgLUl+dAT1SpI0zhwfJUmdNHQSWVUXVtUvAicAfwO8G3hg2HolSRpnjo+SpK4axeWs703yeeCLwDLgncDLB9hvvyR3JPlEWz+iTTpwf5KPJjmgxZ/X1je17Yv76jivxe9LclJffEWLbUqyZtg+SpK0p2Y7PkqStNANPbEOcCfw/qr6uz3c7+3AvcBBbf29wEVVdUWSPwPOAS5uvx+rqpclOb2Ve3OSI4HTgVcAPwz8VZKfaHV9EPh5YAtwW5INVXXP7LsoSdIem+34KEnSgjaKy1k/Ahyd5IL2c/Lu9kmyCHg9cElbD/Aa4GOtyHrg1LZ8SlunbT+hlT8FuKKqnqqqB4FNwHHtZ1NVPVBV3wauaGUlSZozsxkfJUkaB6O4nPXdwO/Su8/jAeB3WuzZ/HHb57tt/cXA41W1va1vAQ5ry4cBDwG07U+08t+L77DPruKSJM2ZWY6PkiQteKO4nPWNwCur6mmAJOvo3f/xjpkKJ3kD8GhVfSHJ5HR4hqK1m227is+UGNcMMZKsojdjHhMTE0xNTc1UbGATB8Lqpdt3X3CMDNunYY/p3rJt27YF27bZsk/joYt9gu72a0h7ND5KkjQuRpFEQu++xsfa8vfvpuyrgTcmeR3w/LbvHwMHJ9m/nW1cRG9adOidSTwc2JJkf+AHgK198Wn9++wq/i9U1Vp6U7CzbNmympyc3E3Tn90HLr+aCzeO6pAuDKuXbh+qT5vPmBxdY0ZoamqKYd/vhcY+jYcu9gm6268R2JPxUZKksTCK50T+Z+CLSS5JcilwO73Jb2ZUVedV1aKqWkxvYpxPV9UZwGfoPUsLYCVwdVve0NZp2z9dVdXip7fZW48AlgC3ArcBS9psrwe019gwgn5KkrQn9mh8lCRpXAx12qxNcHMjvQTweHqXmP6nWc5E93vAFe1+kTuAS1v8UuDDSTbROwN5OkBV3Z3kSuAeYDtwbt8lQ28Drgf2A9ZV1d2z7KIkSXtsxOOjJEkLylBJZFVVkk9U1auAj89i/ylgqi0/QG9m1R3L/DNw2i72fw/wnhni1wLX7ml7JEkahWHHR0mSFrJRXM56a5JjR1CPJEld4vgoSeqkUcwC87PA/5nkb4F/pHfJTlWVA6ckaV/m+ChJ6qRRJJGnjqAOSZK6xvFRktRJw06ssx/w8ao6ekTtkSRp7Dk+SpK6bKh7IttsqPckOWxE7ZEkaew5PkqSumwUl7O+BLg3yU307vkAoKp+aQR1S5I0rhwfJUmdNIok8oIR1CFJUtc4PkqSOmnoJLKqbkzyEmBZC91eVf8wbL2SJI0zx0dJUlcN/ZzIJP8G+CLwq8CZwO1JfnHYeiVJGmeOj5KkrhrF5az/CfjfquprAEkmgE8BV42gbkmSxpXjoySpk4Y+Ewk8Z3qAbL4+onolSRpnjo+SpE4axWD2qSTXJvmVJL8CbKD3TaskSfuyPR4fkzw/ya1J/ibJ3Un+sMWPSHJLkvuTfDTJAS3+vLa+qW1f3FfXeS1+X5KT+uIrWmxTkjV7o+OSpG4bRRL528B64Djg+Lb82yOoV5KkcTab8fEp4DVVdTRwDLAiyXLgvcBFVbUEeAw4p5U/B3isql4GXNTKkeRI4HTgFcAK4E+T7JdkP+CDwMnAkcBbWllJkgY2itlZC/hokv/RV9/3A98ctm5JksbVbMbHts+2tvrc9lPAa4D/o8XXA38AXAyc0pYBPgb8SZK0+BVV9RTwYJJN9JJZgE1V9QBAkita2XuG6askad8ydBKZ5NeBdwFPA98FQm/A+5Fh65YkaVzNdnxsZwu/ALyM3lnDvwUer6rtrcgW4LC2fBjwEEBVbU/yBPDiFr+5r9r+fR7aIX78DG1YBawCmJiYYGpqarf93Z1t27aNpJ5hrV66ffeFFpiJA/d+uxfCe7O3LJS/vXHksRtOl4/fKGZn/T3g6Kp6dAR1SZLUFbMaH6vqaeCYJAfTm8n15TMVa7+zi227is90G0vtFKhaC6wFWLZsWU1OTu6+4bsxNTXFKOoZ1llrrpnvJuyx1Uu3c+HGUXxk27XNZ0zu1frn00L52xtHHrvhdPn4jeKeyAfw0lVJknY01PhYVY8DU8By4OAk01nEIuDhtrwFOBygbf8BYGt/fId9dhWXJGlgo/haaw3w+SQ305sQAICq+g8jqFuSpHG1x+Njkh8EvlNVjyc5EHgtvclyPgO8CbgCWAlc3XbZ0NZvats/XVWVZAPwF0n+CPhhYAlwK70zlEuSHAH8Hb3Jd6bvtZQkaSCjSCL/DPg8sJHePR+SJGl24+OhwPp2X+RzgCur6hNJ7gGuSPJu4A7g0lb+UuDDbeKcrfSSQqrq7iRX0pswZztwbrtMliRvA64H9gPWVdXdw3dVkrQvGUUS+d2q+o0R1CNJUpfs8fhYVXcBr5wh/gDPzK7aH/9n4LRd1PUe4D0zxK8Frt2TdkmS1G8U90TemOTXkvxgkoOmf0ZQryRJ48zxUZLUSaM4E7my/f7DvpiP+JAk7escHyVJnTR0EllVh+++lCRJ+xbHR0lSVw2dRLYpxVcBP9dCU8AlfQ9FliRpn+P4KEnqqlFczvpB4AXAurb+K8Cx9AZOSZL2VY6PkqROGkUSubyqju5b/1SSvxlBvZIkjTPHR0lSJ41idtbvJlk8vdKWfV6kJGlf5/goSeqkUZyJ/F3gs0m+AgR4GXDOCOqVJGmcOT5Kkjpp1mcikywHqKobgJ+kN1j+LvBTVfVXz7Lf85PcmuRvktyd5A9b/IgktyS5P8lHkxzQ4s9r65va9sV9dZ3X4vclOakvvqLFNiVZM9s+SpK0p2Y7PkqSNC6GuZz1T6cXquqfquqLVfWFqvqn3ez3FPCadp/IMcCKNuC+F7ioqpYAj/HMt7XnAI9V1cuAi1o5khwJnA68AlgB/GmS/ZLsR28yg5OBI4G3tLKSJM2F2Y6PkiSNhVHcE7lHqmdbW31u+yngNcDHWnw9cGpbPqWt07afkCQtfkVVPVVVDwKbgOPaz6aqeqCqvg1c0cpKkiRJkoY0zD2RP5Zkw642VtUbd7WtnS38Ar37Qz4I/C3weN+zs7YAh7Xlw4CHWp3bkzwBvLjFb+6rtn+fh3aIH7+LdqyiTbU+MTHB1NTUrpo8kIkDYfXSbj3+a9g+DXtM95Zt27Yt2LbNln0aD13sE3S3X7M06/FRkqRxMEwS+XXgwtnsWFVPA8ckORi4Cnj5TMXa7+xi267iM51drRliVNVaYC3AsmXLanJy8tkbvhsfuPxqLtw4irmKFo7VS7cP1afNZ0yOrjEjNDU1xbDv90Jjn8ZDF/sE3e3XLM16fJQkaRwMk/E8WVV/PcyLV9XjSaaA5cDBSfZvZyMXAQ+3YluAw4EtSfYHfgDY2hef1r/PruKSJO1tQ4+PkiQtZMPcE7l5Njsl+cF2BpIkBwKvBe4FPgO8qRVbCVzdlje0ddr2T1dVtfjpbfbWI4AlwK3AbcCSNtvrAfQm39nlZUWSJI3Y5vlugCRJe9Osz0RW1S9NLyf5GWBxf31Vddkudj0UWN/ui3wOcGVVfSLJPcAVSd4N3AFc2spfCnw4ySZ6ZyBPb/XfneRK4B5gO3Buu0yWJG8Drgf2A9ZV1d2z7ackSXtiiPFRkqSxMPQNfEk+DPw4cCfwdAsXMOMgWVV3Aa+cIf4AvZlVd4z/M3DaLup6D/CeGeLXAtcO1gNJkkZvT8dHSZLGxShmgVkGHNkuMZUkST2Oj5KkThrFcyK/BPzQCOqRJKlLHB8lSZ00ijORLwHuSXIr8NR00OdgSZL2cY6PkqROGkUS+QcjqEOSpK75g/lugCRJe8PQSaTPwpIkaWeOj5Kkrpp1Epnkc1X1s0mepDfb3Pc2AVVVBw3dOkmSxozjoySp64Z5TuTPtt/fP7rmSJI03hwfJUldN4p7IgFI8lLg+dPrVfXVUdUtSdK4cnyUJHXN0I/4SPLGJPcDDwJ/DWwGrhu2XkmSxpnjoySpq0bxnMh3AcuBr1TVEcAJwOdHUK8kSePM8VGS1EmjSCK/U1XfAJ6T5DlV9RngmBHUK0nSOHN8lCR10ijuiXw8yQuBzwKXJ3kU2D6CeiVJGmeOj5KkThrFmchTgG8BvwV8Evhb4BdGUK8kSePM8VGS1ElDn4msqn9si98F1ifZDzgduHzYuiVJGleOj5Kkrpr1mcgkByU5L8mfJDkxPW8DHgB+eXRNlCRpfDg+SpK6bpgzkR8GHgNuAn4d+B3gAOCUqrpzBG2TJGkcOT5KkjptmCTyx6pqKUCSS4B/AH6kqp4cScskSRpPsx4fkxwOXAb8EL3LYNdW1fuSvAj4KLCY3vMmf7mqHksS4H3A6+jdf3lWVX2x1bUSeEer+t1Vtb7FXwV8CDgQuBZ4e1XVCPotSdpHDDOxznemF6rqaeBBE0hJkoYaH7cDq6vq5fSeMXlukiOBNcCNVbUEuLGtA5wMLGk/q4CLAVrSeT5wPHAccH6SQ9o+F7ey0/utmGU/JUn7qGHORB6d5JttOcCBbT1AVdVBQ7dOkqTxM+vxsaoeAR5py08muRc4jN5Mr5Ot2HpgCvi9Fr+snUm8OcnBSQ5tZW+oqq0ASW4AViSZAg6qqpta/DLgVOC60XRdkrQvmHUSWVX7jbIhkiR1wajGxySLgVcCtwATLcGkqh5J8tJW7DDgob7dtrTYs8W3zBCXJGlgQz/iQ5IkjVaSFwJ/CfxmVX2zd+vjzEVniNUs4ju+/ip6l7wyMTHB1NTUAK1+dtu2bRtJPcNavXT7fDdhj00cuPfbvRDem71lofztjSOP3XC6fPxMIiVJWkCSPJdeAnl5VX28hb+W5NB2FvJQ4NEW3wIc3rf7IuDhFp/cIT7V4otmKP8vVNVaYC3AsmXLanJycscie2xqaopR1DOss9ZcM99N2GOrl27nwo179yPb5jMm92r982mh/O2NI4/dcLp8/IaZWEeSJI1Qm231UuDeqvqjvk0bgJVteSVwdV/8zPYsyuXAE+2y1+uBE5Mc0ibUORG4vm17Msny9lpn9tUlSdJAPBMpSdLC8WrgV4GNSaafKfn7wAXAlUnOAb4KnNa2XUvv8R6b6D3i42yAqtqa5F3Aba3cO6cn2QHeyjOP+LgOJ9WRJO0hk0hJkhaIqvocM9+3CHDCDOULOHcXda0D1s0Qvx04aohmSpL2cV7OKkmSJEkamEmkJEmSJGlgJpGSJEmSpIHNeRKZ5PAkn0lyb5K7k7y9xV+U5IYk97ffh7R4krw/yaYkdyU5tq+ula38/UlW9sVflWRj2+f9eZYHbEmSJEmSBjcfZyK3A6ur6uXAcuDcJEcCa4Abq2oJcGNbBzgZWNJ+VgEXQy/pBM4HjgeOA86fTjxbmVV9+62Yg35JkiRJUufNeRJZVY9U1Rfb8pPAvcBhwCnA+lZsPXBqWz4FuKx6bgYObg9aPgm4oaq2VtVjwA3AirbtoKq6qc1ad1lfXZIkSZKkIczrIz6SLAZeCdwCTLSHIFNVjyR5aSt2GPBQ325bWuzZ4ltmiM/0+qvonbFkYmKCqampofozcSCsXrp9qDoWmmH7NOwx3Vu2bdu2YNs2W/ZpPHSxT9DdfkmSpJ3NWxKZ5IXAXwK/WVXffJbbFmfaULOI7xysWgusBVi2bFlNTk7uptXP7gOXX82FG7v16M3VS7cP1afNZ0yOrjEjNDU1xbDv90Jjn8ZDF/sE3e2XtK9YvOaa+W4CAJsveP18N0HSAOZldtYkz6WXQF5eVR9v4a+1S1Fpvx9t8S3A4X27LwIe3k180QxxSZIkSdKQ5mN21gCXAvdW1R/1bdoATM+wuhK4ui9+ZpuldTnwRLvs9XrgxCSHtAl1TgSub9ueTLK8vdaZfXVJkiRJkoYwH9devhr4VWBjkjtb7PeBC4Ark5wDfBU4rW27FngdsAn4FnA2QFVtTfIu4LZW7p1VtbUtvxX4EHAgcF37kSRJkiQNac6TyKr6HDPftwhwwgzlCzh3F3WtA9bNEL8dOGqIZkqSJEmSZjAv90RKkiRJksaTSaQkSZIkaWAmkZIkSZKkgZlESpIkSZIGZhIpSZIkSRqYSaQkSZIkaWAmkZIkSZKkgZlESpIkSZIGZhIpSZIkSRrY/vPdAEmS1H0b/+4JzlpzzXw3Q5I0Ap6JlCRJkiQNzCRSkiRJkjQwk0hJkiRJ0sBMIiVJkiRJAzOJlCRJkiQNzCRSkiRJkjQwH/GhvWrxAprOffMFr5/vJkiSJEljzzORkiRJkqSBmURKkiRJkgZmEilJkiRJGphJpCRJkiRpYCaRkiRJkqSBmURKkrRAJFmX5NEkX+qLvSjJDUnub78PafEkeX+STUnuSnJs3z4rW/n7k6zsi78qyca2z/uTZG57KEnqApNISZIWjg8BK3aIrQFurKolwI1tHeBkYEn7WQVcDL2kEzgfOB44Djh/OvFsZVb17bfja0mStFsmkZIkLRBV9Vlg6w7hU4D1bXk9cGpf/LLquRk4OMmhwEnADVW1taoeA24AVrRtB1XVTVVVwGV9dUmSNLD957sBkiTpWU1U1SMAVfVIkpe2+GHAQ33ltrTYs8W3zBDfSZJV9M5YMjExwdTU1PCdOBBWL90+dD37on3p2I3ib21H27Zt2yv17gs8dsPp8vEziZQkaTzNdD9jzSK+c7BqLbAWYNmyZTU5OTnLJj7jA5dfzYUb/dgxG6uXbt9njt3mMyZHXufU1BSj+BveF3nshtPl4zcvl7M6cYAkSQP7WrsUlfb70RbfAhzeV24R8PBu4otmiEuStEfm657ID+HEAZIkDWIDMP1F6Urg6r74me3L1uXAE+2y1+uBE5Mc0sbFE4Hr27YnkyxvX66e2VeXJEkDm5ck0okDJEnaWZKPADcBP5lkS5JzgAuAn09yP/DzbR3gWuABYBPw34D/C6CqtgLvAm5rP+9sMYC3Ape0ff4WuG4u+iVJ6paFdIH9nE8cIEnSQlJVb9nFphNmKFvAubuoZx2wbob47cBRw7RRkqSFlETuyl6bOGDUs891cfa0LvWp//3t4mxZ9mk8dLFP0N1+SZKknS2kJPJrSQ5tZyEHnThgcof4FHswccCoZ5/r4sxzXZoRrn/Gty7OlmWfxkMX+wTd7ZckSdrZfE2sMxMnDpAkSZKkBW5eTjG1iQMmgZck2UJvltULgCvbJAJfBU5rxa8FXkdvEoBvAWdDb+KAJNMTB8DOEwd8CDiQ3qQBThwgSZIkSSMwL0mkEwdIkiRJ0nhaSJezSpIkSZIWOJNISZIkSdLATCIlSZIkSQMziZQkSZIkDcwkUpIkSZI0MJNISZIkSdLATCIlSZIkSQMziZQkSZIkDWz/+W6AJEmSBLB4zTUjr3P10u2cNYt6N1/w+pG3ReoKz0RKkiRJkgZmEilJkiRJGphJpCRJkiRpYCaRkiRJkqSBmURKkiRJkgZmEilJkiRJGphJpCRJkiRpYCaRkiRJkqSBmURKkiRJkgZmEilJkiRJGphJpCRJkiRpYCaRkiRJkqSBmURKkiRJkgZmEilJkiRJGphJpCRJkiRpYCaRkiRJkqSBmURKkiRJkga2/3w3QJori9dc873l1Uu3c1bf+lzbfMHr5+21JUmSpGGYREqSJEk7WDyPXzb384tnLUSdvZw1yYok9yXZlGTNfLdHkqSFwjFSkjSMTiaRSfYDPgicDBwJvCXJkfPbKkmS5p9jpCRpWJ1MIoHjgE1V9UBVfRu4AjhlntskSdJC4BgpSRpKV++JPAx4qG99C3D8PLVF2sneuM9iNpMFeZ+FtE9yjJTGyHzem7njZws/N2haV5PIzBCrnQolq4BVbXVbkvuGfN2XAP8wZB0Lym90sE/QzX7Npk95715qzOh07n2im32C8erXj853A+bZbsfIvTA+wnj9jSwoXRyz5pLHb/Z2PHZj8LlhoRnHv72BxsiuJpFbgMP71hcBD+9YqKrWAmtH9aJJbq+qZaOqbyHoYp+gm/2yT+Ohi32C7varo3Y7Ro56fAT/RobhsRuOx2/2PHbD6fLx6+o9kbcBS5IckeQA4HRgwzy3SZKkhcAxUpI0lE6eiayq7UneBlwP7Aesq6q757lZkiTNO8dISdKwOplEAlTVtcC1c/yyI730Z4HoYp+gm/2yT+Ohi32C7varkxwjx47Hbjgev9nz2A2ns8cvVTvNNyNJkiRJ0oy6ek+kJEmSJGkvMIkckSQrktyXZFOSNfPdntlIcniSzyS5N8ndSd7e4i9KckOS+9vvQ+a7rXsqyX5J7kjyibZ+RJJbWp8+2iaXGBtJDk7ysSRfbu/XT4/7+5Tkt9rf3ZeSfCTJ88fxfUqyLsmjSb7UF5vxvUnP+9v/G3clOXb+Wr5ru+jTf2l/f3cluSrJwX3bzmt9ui/JSfPTai0UXRgf51KXx+K50rUxfy518fPFXOnK55hBmUSOQJL9gA8CJwNHAm9JcuT8tmpWtgOrq+rlwHLg3NaPNcCNVbUEuLGtj5u3A/f2rb8XuKj16THgnHlp1ey9D/hkVf0UcDS9vo3t+5TkMOA3gGVVdRS9yT5OZzzfpw8BK3aI7eq9ORlY0n5WARfPURv31IfYuU83AEdV1b8CvgKcB9D+zzgdeEXb50/b/5HaB3VofJxLXR6L50rXxvy51KnPF3OlY59jBmISORrHAZuq6oGq+jZwBXDKPLdpj1XVI1X1xbb8JL3/OA6j15f1rdh64NT5aeHsJFkEvB64pK0HeA3wsVZkrPqU5CDg54BLAarq21X1OGP+PtGb6OvAJPsD3wc8whi+T1X1WWDrDuFdvTenAJdVz83AwUkOnZuWDm6mPlXVp6pqe1u9md6zBqHXpyuq6qmqehDYRO//SO2bOjE+zqWujsVzpWtj/lzq8OeLudKJzzGDMokcjcOAh/rWt7TY2EqyGHglcAswUVWPQG9wA146fy2blT8Gfhf4blt/MfB43wfgcXu/fgz4OvDn7XKdS5K8gDF+n6rq74D/G/gqvf90nwC+wHi/T/129d505f+OXwOua8td6ZNGw7+HIXRsLJ4rXRvz51LnPl/MlX3gc8xOTCJHIzPExnba2yQvBP4S+M2q+uZ8t2cYSd4APFpVX+gPz1B0nN6v/YFjgYur6pXAPzLml5a0+ytOAY4Afhh4Ab3L33Y0Tu/TIMb9b5Ek/5He5XeXT4dmKDZWfdJI+fcwS10ai+dKR8f8udS5zxdzZV/8HGMSORpbgMP71hcBD89TW4aS5Ln0Bq3Lq+rjLfy16Uvs2u9H56t9s/Bq4I1JNtO7jOo19L6lPLhdbgDj935tAbZU1S1t/WP0/tMf5/fptcCDVfX1qvoO8HHgZxjv96nfrt6bsf6/I8lK4A3AGfXM86LGuk8aOf8eZqGDY/Fc6eKYP5e6+PlirnT9c8xOTCJH4zZgSZuB6QB6N9JumOc27bF238ClwL1V9Ud9mzYAK9vySuDquW7bbFXVeVW1qKoW03tfPl1VZwCfAd7Uio1bn/4eeCjJT7bQCcA9jPH7RO/yj+VJvq/9HU73aWzfpx3s6r3ZAJzZZmldDjwxfcnQQpdkBfB7wBur6lt9mzYApyd5XpIj6E0adOt8tFELQifGx7nUxbF4rnRxzJ9LHf18MVe6/jlmJ3nmy2MNI8nr6H3btR+wrqreM89N2mNJfhb4n8BGnrmX4PfpKex6JgAABd1JREFU3YtxJfAj9P6RnFZVO04csuAlmQR+u6rekOTH6H1L+SLgDuBXquqp+WzfnkhyDL1JAw4AHgDOpvel0Ni+T0n+EHgzvUsj7wB+nd69A2P1PiX5CDAJvAT4GnA+8N+Z4b1pA82f0JvF9FvA2VV1+3y0+9nsok/nAc8DvtGK3VxV/66V/4/07pPcTu9SvOt2rFP7ji6Mj3Op62PxXOnSmD+Xuvj5Yq505XPMoEwiJUmSJEkD83JWSZIkSdLATCIlSZIkSQMziZQkSZIkDcwkUpIkSZI0MJNISZIkSdLATCKlvSzJRUl+s2/9+iSX9K1fmOT3k3xsD+s9K8mftOWfTDKV5M4k9yZZO7oezPjak0k+0ZYPSXJVkruS3JrkqL352pKk7tgHxshT2vh4Z5Lb2yNcpLFnEintff8L+BmAJM+h96y9V/Rt/xngxqp60wz7Dur9wEVVdUxVvRz4wBB17anfB+6sqn8FnAm8bw5fW5I03ro+Rt4IHF1Vx9B7fu4luykvjQWTSGnv+zxtgKQ3MH4JeLKdwXse8HLgsSRfgu99e/rxJJ9Mcn+S/zxdUZKzk3wlyV8Dr+57jUOBLdMrVbWxr66rW133JTm/r65faWcO70zyX5Ps1+InJrkpyReT/L9JXtjiK5J8OcnngF/qe+0j6Q2SVNWXgcVJJto+/z3JF5LcnWRV32tvS/Letu2vkhzXviV+IMkbhzrakqRx0ukxsqq21TMPZX8BUK38ZJLPtit57knyZy2JdozUWDCJlPayqnoY2J7kR+gNlDcBtwA/DSwD7gK+vcNuxwBvBpYCb05yeJJDgT+kNzD+PL3kbdpFwKeTXJfkt5Ic3LftOOCMVudpSZYleXmr/9Xt29GngTOSvAR4B/DaqjoWuB34D0meD/w34BeA/x34ob76/4Y2YCY5DvhRYFHb9mtV9arWz99I8uIWfwEw1bY9Cby79ekXgXcOclwlSeNvHxgjSfKLSb4MXEPvbGT/a69u/fhxnkk+HSO14O0/3w2Q9hHT37T+DPBHwGFt+Ql6l/Ls6MaqegIgyT30ErOX0BtUvt7iHwV+AqCq/jzJ9cAK4BTg3yY5utV1Q1V9o+3zceBnge3Aq4DbkgAcCDwKLKc38H6+xQ+gN6D/FPBgVd3f6vl/gOkzixcA70tyJ7ARuKPVD73E8Rfb8uHAEuAb9D4QfLLFNwJPVdV3kmwEFg90RCVJXdHlMZKqugq4KsnPAe8CXts23VpVD7R9PtJe+2M4RmoMmERKc2P6no+l9C7VeYjet4/fBNbNUP6pvuWneebfas1Qtreh923uOmBdu+znqF3sU0CA9VV1Xv+GJL9Ab0B9yw7xY3b12lX1TeDsVi7Ag8CDSSbpDZQ/XVXfSjIFPL/t9p2+y3u+O93fqvpuEv9fkqR9S2fHyB3a8NkkP97OaO7qtcExUmPAy1mlufF54A3A1qp6uqq2AgfTu1znpgHruAWYTPLiJM8FTpve0O7FeG5b/iHgxcDftc0/n+RFSQ4ETm1tuRF4U5KXtn1elORHgZuBVyd5WYt/X5KfAL4MHJHkx1udb+l77YOTHNBWfx34bEssfwB4rCWQP0XvG1xJknbU5THyZe0LVpIcS+/s5Tfa5uOSHNHuhXwz8LkB+yrNO7/NkObGRnqX2vzFDrEXVtU/TN+Y/2yq6pEkf0BvQH0E+CKwX9t8Ir1LSv+5rf9OVf19G7c+B3wYeBnwF1V1O0CSdwCfaoPXd4Bzq+rmJGcBH0lvQgOAd1TVV9KbGOeaJP/Q6pz+FvflwGVJngbuAc5p8U8C/y7JXcB99AZfSZJ21OUx8t8AZyb5DvBPwJurqtpr30TvlpClwGeBqwY7XNL8yzNnyyV1TRvsllXV2+a7LZIkLSTzOUa2Wz5+u6reMNevLY2Cl7NKkiRJkgbmmUhJkiRJ0sA8EylJkiRJGphJpCRJkiRpYCaRkiRJkqSBmURKkiRJkgZmEilJkiRJGphJpCRJkiRpYP8/vFP5mWsen2wAAAAASUVORK5CYII=\n",
+      "text/plain": [
+       "<Figure size 1080x720 with 4 Axes>"
+      ]
+     },
+     "metadata": {
+      "needs_background": "light"
+     },
+     "output_type": "display_data"
+    }
+   ],
+   "source": [
+    "# plot histogram to check distribution\n",
+    "\n",
+    "plt.figure(figsize=(15,10))\n",
+    "\n",
+    "\n",
+    "plt.subplot(2, 2, 1)\n",
+    "fig = df.Rainfall.hist(bins=10)\n",
+    "fig.set_xlabel('Rainfall')\n",
+    "fig.set_ylabel('RainTomorrow')\n",
+    "\n",
+    "\n",
+    "plt.subplot(2, 2, 2)\n",
+    "fig = df.Evaporation.hist(bins=10)\n",
+    "fig.set_xlabel('Evaporation')\n",
+    "fig.set_ylabel('RainTomorrow')\n",
+    "\n",
+    "\n",
+    "plt.subplot(2, 2, 3)\n",
+    "fig = df.WindSpeed9am.hist(bins=10)\n",
+    "fig.set_xlabel('WindSpeed9am')\n",
+    "fig.set_ylabel('RainTomorrow')\n",
+    "\n",
+    "\n",
+    "plt.subplot(2, 2, 4)\n",
+    "fig = df.WindSpeed3pm.hist(bins=10)\n",
+    "fig.set_xlabel('WindSpeed3pm')\n",
+    "fig.set_ylabel('RainTomorrow')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "We can see that all the four variables are skewed. So, I will use interquantile range to find outliers."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 56,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Rainfall outliers are values < -2.4000000000000004 or > 3.2\n"
+     ]
+    }
+   ],
+   "source": [
+    "# find outliers for Rainfall variable\n",
+    "\n",
+    "IQR = df.Rainfall.quantile(0.75) - df.Rainfall.quantile(0.25)\n",
+    "Lower_fence = df.Rainfall.quantile(0.25) - (IQR * 3)\n",
+    "Upper_fence = df.Rainfall.quantile(0.75) + (IQR * 3)\n",
+    "print('Rainfall outliers are values < {lowerboundary} or > {upperboundary}'.format(lowerboundary=Lower_fence, upperboundary=Upper_fence))\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "For `Rainfall`, the minimum and maximum values are 0.0 and 371.0. So, the outliers are values > 3.2."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 57,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Evaporation outliers are values < -11.800000000000002 or > 21.800000000000004\n"
+     ]
+    }
+   ],
+   "source": [
+    "# find outliers for Evaporation variable\n",
+    "\n",
+    "IQR = df.Evaporation.quantile(0.75) - df.Evaporation.quantile(0.25)\n",
+    "Lower_fence = df.Evaporation.quantile(0.25) - (IQR * 3)\n",
+    "Upper_fence = df.Evaporation.quantile(0.75) + (IQR * 3)\n",
+    "print('Evaporation outliers are values < {lowerboundary} or > {upperboundary}'.format(lowerboundary=Lower_fence, upperboundary=Upper_fence))\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "For `Evaporation`, the minimum and maximum values are 0.0 and 145.0. So, the outliers are values > 21.8."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 58,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "WindSpeed9am outliers are values < -29.0 or > 55.0\n"
+     ]
+    }
+   ],
+   "source": [
+    "# find outliers for WindSpeed9am variable\n",
+    "\n",
+    "IQR = df.WindSpeed9am.quantile(0.75) - df.WindSpeed9am.quantile(0.25)\n",
+    "Lower_fence = df.WindSpeed9am.quantile(0.25) - (IQR * 3)\n",
+    "Upper_fence = df.WindSpeed9am.quantile(0.75) + (IQR * 3)\n",
+    "print('WindSpeed9am outliers are values < {lowerboundary} or > {upperboundary}'.format(lowerboundary=Lower_fence, upperboundary=Upper_fence))\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "For `WindSpeed9am`, the minimum and maximum values are 0.0 and 130.0. So, the outliers are values > 55.0."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 59,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "WindSpeed3pm outliers are values < -20.0 or > 57.0\n"
+     ]
+    }
+   ],
+   "source": [
+    "# find outliers for WindSpeed3pm variable\n",
+    "\n",
+    "IQR = df.WindSpeed3pm.quantile(0.75) - df.WindSpeed3pm.quantile(0.25)\n",
+    "Lower_fence = df.WindSpeed3pm.quantile(0.25) - (IQR * 3)\n",
+    "Upper_fence = df.WindSpeed3pm.quantile(0.75) + (IQR * 3)\n",
+    "print('WindSpeed3pm outliers are values < {lowerboundary} or > {upperboundary}'.format(lowerboundary=Lower_fence, upperboundary=Upper_fence))\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "For `WindSpeed3pm`, the minimum and maximum values are 0.0 and 87.0. So, the outliers are values > 57.0."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## 8. Declare feature vector and target variable"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 60,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "X = df.drop(['RainTomorrow'], axis=1)\n",
+    "\n",
+    "y = df['RainTomorrow']"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## 9. Split data into separate training and test set"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 61,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# split X and y into training and testing sets\n",
+    "\n",
+    "from sklearn.model_selection import train_test_split\n",
+    "\n",
+    "X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 0)\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 62,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "((113754, 24), (28439, 24))"
+      ]
+     },
+     "execution_count": 62,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# check the shape of X_train and X_test\n",
+    "\n",
+    "X_train.shape, X_test.shape"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## 10. Feature Engineering\n",
+    "\n",
+    "\n",
+    "**Feature Engineering** is the process of transforming raw data into useful features that help us to understand our model better and increase its predictive power. I will carry out feature engineering on different types of variables.\n",
+    "\n",
+    "\n",
+    "First, I will display the categorical and numerical variables again separately."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 63,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "Location          object\n",
+       "MinTemp          float64\n",
+       "MaxTemp          float64\n",
+       "Rainfall         float64\n",
+       "Evaporation      float64\n",
+       "Sunshine         float64\n",
+       "WindGustDir       object\n",
+       "WindGustSpeed    float64\n",
+       "WindDir9am        object\n",
+       "WindDir3pm        object\n",
+       "WindSpeed9am     float64\n",
+       "WindSpeed3pm     float64\n",
+       "Humidity9am      float64\n",
+       "Humidity3pm      float64\n",
+       "Pressure9am      float64\n",
+       "Pressure3pm      float64\n",
+       "Cloud9am         float64\n",
+       "Cloud3pm         float64\n",
+       "Temp9am          float64\n",
+       "Temp3pm          float64\n",
+       "RainToday         object\n",
+       "Year               int64\n",
+       "Month              int64\n",
+       "Day                int64\n",
+       "dtype: object"
+      ]
+     },
+     "execution_count": 63,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# check data types in X_train\n",
+    "\n",
+    "X_train.dtypes"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 64,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "['Location', 'WindGustDir', 'WindDir9am', 'WindDir3pm', 'RainToday']"
+      ]
+     },
+     "execution_count": 64,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# display categorical variables\n",
+    "\n",
+    "categorical = [col for col in X_train.columns if X_train[col].dtypes == 'O']\n",
+    "\n",
+    "categorical"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 65,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "['MinTemp',\n",
+       " 'MaxTemp',\n",
+       " 'Rainfall',\n",
+       " 'Evaporation',\n",
+       " 'Sunshine',\n",
+       " 'WindGustSpeed',\n",
+       " 'WindSpeed9am',\n",
+       " 'WindSpeed3pm',\n",
+       " 'Humidity9am',\n",
+       " 'Humidity3pm',\n",
+       " 'Pressure9am',\n",
+       " 'Pressure3pm',\n",
+       " 'Cloud9am',\n",
+       " 'Cloud3pm',\n",
+       " 'Temp9am',\n",
+       " 'Temp3pm',\n",
+       " 'Year',\n",
+       " 'Month',\n",
+       " 'Day']"
+      ]
+     },
+     "execution_count": 65,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# display numerical variables\n",
+    "\n",
+    "numerical = [col for col in X_train.columns if X_train[col].dtypes != 'O']\n",
+    "\n",
+    "numerical"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Engineering missing values in numerical variables\n",
+    "\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 66,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "MinTemp            495\n",
+       "MaxTemp            264\n",
+       "Rainfall          1139\n",
+       "Evaporation      48718\n",
+       "Sunshine         54314\n",
+       "WindGustSpeed     7367\n",
+       "WindSpeed9am      1086\n",
+       "WindSpeed3pm      2094\n",
+       "Humidity9am       1449\n",
+       "Humidity3pm       2890\n",
+       "Pressure9am      11212\n",
+       "Pressure3pm      11186\n",
+       "Cloud9am         43137\n",
+       "Cloud3pm         45768\n",
+       "Temp9am            740\n",
+       "Temp3pm           2171\n",
+       "Year                 0\n",
+       "Month                0\n",
+       "Day                  0\n",
+       "dtype: int64"
+      ]
+     },
+     "execution_count": 66,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# check missing values in numerical variables in X_train\n",
+    "\n",
+    "X_train[numerical].isnull().sum()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 67,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "MinTemp            142\n",
+       "MaxTemp             58\n",
+       "Rainfall           267\n",
+       "Evaporation      12125\n",
+       "Sunshine         13502\n",
+       "WindGustSpeed     1903\n",
+       "WindSpeed9am       262\n",
+       "WindSpeed3pm       536\n",
+       "Humidity9am        325\n",
+       "Humidity3pm        720\n",
+       "Pressure9am       2802\n",
+       "Pressure3pm       2795\n",
+       "Cloud9am         10520\n",
+       "Cloud3pm         11326\n",
+       "Temp9am            164\n",
+       "Temp3pm            555\n",
+       "Year                 0\n",
+       "Month                0\n",
+       "Day                  0\n",
+       "dtype: int64"
+      ]
+     },
+     "execution_count": 67,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# check missing values in numerical variables in X_test\n",
+    "\n",
+    "X_test[numerical].isnull().sum()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 68,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "MinTemp 0.0044\n",
+      "MaxTemp 0.0023\n",
+      "Rainfall 0.01\n",
+      "Evaporation 0.4283\n",
+      "Sunshine 0.4775\n",
+      "WindGustSpeed 0.0648\n",
+      "WindSpeed9am 0.0095\n",
+      "WindSpeed3pm 0.0184\n",
+      "Humidity9am 0.0127\n",
+      "Humidity3pm 0.0254\n",
+      "Pressure9am 0.0986\n",
+      "Pressure3pm 0.0983\n",
+      "Cloud9am 0.3792\n",
+      "Cloud3pm 0.4023\n",
+      "Temp9am 0.0065\n",
+      "Temp3pm 0.0191\n"
+     ]
+    }
+   ],
+   "source": [
+    "# print percentage of missing values in the numerical variables in training set\n",
+    "\n",
+    "for col in numerical:\n",
+    "    if X_train[col].isnull().mean()>0:\n",
+    "        print(col, round(X_train[col].isnull().mean(),4))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Assumption\n",
+    "\n",
+    "\n",
+    "I assume that the data are missing completely at random (MCAR). There are two methods which can be used to impute missing values. One is mean or median imputation and other one is random sample imputation. When there are outliers in the dataset, we should use median imputation. So, I will use median imputation because median imputation is robust to outliers.\n",
+    "\n",
+    "\n",
+    "I will impute missing values with the appropriate statistical measures of the data, in this case median. Imputation should be done over the training set, and then propagated to the test set. It means that the statistical measures to be used to fill missing values both in train and test set, should be extracted from the train set only. This is to avoid overfitting."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 69,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# impute missing values in X_train and X_test with respective column median in X_train\n",
+    "\n",
+    "for df1 in [X_train, X_test]:\n",
+    "    for col in numerical:\n",
+    "        col_median=X_train[col].median()\n",
+    "        df1[col].fillna(col_median, inplace=True)           \n",
+    "      "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 70,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "MinTemp          0\n",
+       "MaxTemp          0\n",
+       "Rainfall         0\n",
+       "Evaporation      0\n",
+       "Sunshine         0\n",
+       "WindGustSpeed    0\n",
+       "WindSpeed9am     0\n",
+       "WindSpeed3pm     0\n",
+       "Humidity9am      0\n",
+       "Humidity3pm      0\n",
+       "Pressure9am      0\n",
+       "Pressure3pm      0\n",
+       "Cloud9am         0\n",
+       "Cloud3pm         0\n",
+       "Temp9am          0\n",
+       "Temp3pm          0\n",
+       "Year             0\n",
+       "Month            0\n",
+       "Day              0\n",
+       "dtype: int64"
+      ]
+     },
+     "execution_count": 70,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# check again missing values in numerical variables in X_train\n",
+    "\n",
+    "X_train[numerical].isnull().sum()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 71,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "MinTemp          0\n",
+       "MaxTemp          0\n",
+       "Rainfall         0\n",
+       "Evaporation      0\n",
+       "Sunshine         0\n",
+       "WindGustSpeed    0\n",
+       "WindSpeed9am     0\n",
+       "WindSpeed3pm     0\n",
+       "Humidity9am      0\n",
+       "Humidity3pm      0\n",
+       "Pressure9am      0\n",
+       "Pressure3pm      0\n",
+       "Cloud9am         0\n",
+       "Cloud3pm         0\n",
+       "Temp9am          0\n",
+       "Temp3pm          0\n",
+       "Year             0\n",
+       "Month            0\n",
+       "Day              0\n",
+       "dtype: int64"
+      ]
+     },
+     "execution_count": 71,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# check missing values in numerical variables in X_test\n",
+    "\n",
+    "X_test[numerical].isnull().sum()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Now, we can see that there are no missing values in the numerical columns of training and test set."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Engineering missing values in categorical variables"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 72,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "Location       0.000000\n",
+       "WindGustDir    0.065114\n",
+       "WindDir9am     0.070134\n",
+       "WindDir3pm     0.026443\n",
+       "RainToday      0.010013\n",
+       "dtype: float64"
+      ]
+     },
+     "execution_count": 72,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# print percentage of missing values in the categorical variables in training set\n",
+    "\n",
+    "X_train[categorical].isnull().mean()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 73,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "WindGustDir 0.06511419378659213\n",
+      "WindDir9am 0.07013379749283542\n",
+      "WindDir3pm 0.026443026179299188\n",
+      "RainToday 0.01001283471350458\n"
+     ]
+    }
+   ],
+   "source": [
+    "# print categorical variables with missing data\n",
+    "\n",
+    "for col in categorical:\n",
+    "    if X_train[col].isnull().mean()>0:\n",
+    "        print(col, (X_train[col].isnull().mean()))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 74,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# impute missing categorical variables with most frequent value\n",
+    "\n",
+    "for df2 in [X_train, X_test]:\n",
+    "    df2['WindGustDir'].fillna(X_train['WindGustDir'].mode()[0], inplace=True)\n",
+    "    df2['WindDir9am'].fillna(X_train['WindDir9am'].mode()[0], inplace=True)\n",
+    "    df2['WindDir3pm'].fillna(X_train['WindDir3pm'].mode()[0], inplace=True)\n",
+    "    df2['RainToday'].fillna(X_train['RainToday'].mode()[0], inplace=True)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 75,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "Location       0\n",
+       "WindGustDir    0\n",
+       "WindDir9am     0\n",
+       "WindDir3pm     0\n",
+       "RainToday      0\n",
+       "dtype: int64"
+      ]
+     },
+     "execution_count": 75,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# check missing values in categorical variables in X_train\n",
+    "\n",
+    "X_train[categorical].isnull().sum()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 76,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "Location       0\n",
+       "WindGustDir    0\n",
+       "WindDir9am     0\n",
+       "WindDir3pm     0\n",
+       "RainToday      0\n",
+       "dtype: int64"
+      ]
+     },
+     "execution_count": 76,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# check missing values in categorical variables in X_test\n",
+    "\n",
+    "X_test[categorical].isnull().sum()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "As a final check, I will check for missing values in X_train and X_test."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 77,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "Location         0\n",
+       "MinTemp          0\n",
+       "MaxTemp          0\n",
+       "Rainfall         0\n",
+       "Evaporation      0\n",
+       "Sunshine         0\n",
+       "WindGustDir      0\n",
+       "WindGustSpeed    0\n",
+       "WindDir9am       0\n",
+       "WindDir3pm       0\n",
+       "WindSpeed9am     0\n",
+       "WindSpeed3pm     0\n",
+       "Humidity9am      0\n",
+       "Humidity3pm      0\n",
+       "Pressure9am      0\n",
+       "Pressure3pm      0\n",
+       "Cloud9am         0\n",
+       "Cloud3pm         0\n",
+       "Temp9am          0\n",
+       "Temp3pm          0\n",
+       "RainToday        0\n",
+       "Year             0\n",
+       "Month            0\n",
+       "Day              0\n",
+       "dtype: int64"
+      ]
+     },
+     "execution_count": 77,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# check missing values in X_train\n",
+    "\n",
+    "X_train.isnull().sum()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 78,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "Location         0\n",
+       "MinTemp          0\n",
+       "MaxTemp          0\n",
+       "Rainfall         0\n",
+       "Evaporation      0\n",
+       "Sunshine         0\n",
+       "WindGustDir      0\n",
+       "WindGustSpeed    0\n",
+       "WindDir9am       0\n",
+       "WindDir3pm       0\n",
+       "WindSpeed9am     0\n",
+       "WindSpeed3pm     0\n",
+       "Humidity9am      0\n",
+       "Humidity3pm      0\n",
+       "Pressure9am      0\n",
+       "Pressure3pm      0\n",
+       "Cloud9am         0\n",
+       "Cloud3pm         0\n",
+       "Temp9am          0\n",
+       "Temp3pm          0\n",
+       "RainToday        0\n",
+       "Year             0\n",
+       "Month            0\n",
+       "Day              0\n",
+       "dtype: int64"
+      ]
+     },
+     "execution_count": 78,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# check missing values in X_test\n",
+    "\n",
+    "X_test.isnull().sum()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "We can see that there are no missing values in X_train and X_test."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Engineering outliers in numerical variables\n",
+    "\n",
+    "\n",
+    "We have seen that the `Rainfall`, `Evaporation`, `WindSpeed9am` and `WindSpeed3pm` columns contain outliers. I will use top-coding approach to cap maximum values and remove outliers from the above variables."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 79,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "def max_value(df3, variable, top):\n",
+    "    return np.where(df3[variable]>top, top, df3[variable])\n",
+    "\n",
+    "for df3 in [X_train, X_test]:\n",
+    "    df3['Rainfall'] = max_value(df3, 'Rainfall', 3.2)\n",
+    "    df3['Evaporation'] = max_value(df3, 'Evaporation', 21.8)\n",
+    "    df3['WindSpeed9am'] = max_value(df3, 'WindSpeed9am', 55)\n",
+    "    df3['WindSpeed3pm'] = max_value(df3, 'WindSpeed3pm', 57)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 80,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "(3.2, 3.2)"
+      ]
+     },
+     "execution_count": 80,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "X_train.Rainfall.max(), X_test.Rainfall.max()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 81,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "(21.8, 21.8)"
+      ]
+     },
+     "execution_count": 81,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "X_train.Evaporation.max(), X_test.Evaporation.max()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 82,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "(55.0, 55.0)"
+      ]
+     },
+     "execution_count": 82,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "X_train.WindSpeed9am.max(), X_test.WindSpeed9am.max()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 83,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "(57.0, 57.0)"
+      ]
+     },
+     "execution_count": 83,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "X_train.WindSpeed3pm.max(), X_test.WindSpeed3pm.max()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 84,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>MinTemp</th>\n",
+       "      <th>MaxTemp</th>\n",
+       "      <th>Rainfall</th>\n",
+       "      <th>Evaporation</th>\n",
+       "      <th>Sunshine</th>\n",
+       "      <th>WindGustSpeed</th>\n",
+       "      <th>WindSpeed9am</th>\n",
+       "      <th>WindSpeed3pm</th>\n",
+       "      <th>Humidity9am</th>\n",
+       "      <th>Humidity3pm</th>\n",
+       "      <th>Pressure9am</th>\n",
+       "      <th>Pressure3pm</th>\n",
+       "      <th>Cloud9am</th>\n",
+       "      <th>Cloud3pm</th>\n",
+       "      <th>Temp9am</th>\n",
+       "      <th>Temp3pm</th>\n",
+       "      <th>Year</th>\n",
+       "      <th>Month</th>\n",
+       "      <th>Day</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>count</th>\n",
+       "      <td>113754.000000</td>\n",
+       "      <td>113754.000000</td>\n",
+       "      <td>113754.000000</td>\n",
+       "      <td>113754.000000</td>\n",
+       "      <td>113754.000000</td>\n",
+       "      <td>113754.000000</td>\n",
+       "      <td>113754.000000</td>\n",
+       "      <td>113754.000000</td>\n",
+       "      <td>113754.000000</td>\n",
+       "      <td>113754.000000</td>\n",
+       "      <td>113754.000000</td>\n",
+       "      <td>113754.000000</td>\n",
+       "      <td>113754.000000</td>\n",
+       "      <td>113754.000000</td>\n",
+       "      <td>113754.000000</td>\n",
+       "      <td>113754.000000</td>\n",
+       "      <td>113754.000000</td>\n",
+       "      <td>113754.000000</td>\n",
+       "      <td>113754.000000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>mean</th>\n",
+       "      <td>12.193497</td>\n",
+       "      <td>23.237216</td>\n",
+       "      <td>0.675080</td>\n",
+       "      <td>5.151606</td>\n",
+       "      <td>8.041154</td>\n",
+       "      <td>39.884074</td>\n",
+       "      <td>13.978155</td>\n",
+       "      <td>18.614756</td>\n",
+       "      <td>68.867486</td>\n",
+       "      <td>51.509547</td>\n",
+       "      <td>1017.640649</td>\n",
+       "      <td>1015.241101</td>\n",
+       "      <td>4.651801</td>\n",
+       "      <td>4.703588</td>\n",
+       "      <td>16.995062</td>\n",
+       "      <td>21.688643</td>\n",
+       "      <td>2012.759727</td>\n",
+       "      <td>6.404021</td>\n",
+       "      <td>15.710419</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>std</th>\n",
+       "      <td>6.388279</td>\n",
+       "      <td>7.094149</td>\n",
+       "      <td>1.183837</td>\n",
+       "      <td>2.823707</td>\n",
+       "      <td>2.769480</td>\n",
+       "      <td>13.116959</td>\n",
+       "      <td>8.806558</td>\n",
+       "      <td>8.685862</td>\n",
+       "      <td>18.935587</td>\n",
+       "      <td>20.530723</td>\n",
+       "      <td>6.738680</td>\n",
+       "      <td>6.675168</td>\n",
+       "      <td>2.292726</td>\n",
+       "      <td>2.117847</td>\n",
+       "      <td>6.463772</td>\n",
+       "      <td>6.855649</td>\n",
+       "      <td>2.540419</td>\n",
+       "      <td>3.427798</td>\n",
+       "      <td>8.796821</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>min</th>\n",
+       "      <td>-8.200000</td>\n",
+       "      <td>-4.800000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>6.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>980.500000</td>\n",
+       "      <td>977.100000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>-7.200000</td>\n",
+       "      <td>-5.400000</td>\n",
+       "      <td>2007.000000</td>\n",
+       "      <td>1.000000</td>\n",
+       "      <td>1.000000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>25%</th>\n",
+       "      <td>7.600000</td>\n",
+       "      <td>18.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>4.000000</td>\n",
+       "      <td>8.200000</td>\n",
+       "      <td>31.000000</td>\n",
+       "      <td>7.000000</td>\n",
+       "      <td>13.000000</td>\n",
+       "      <td>57.000000</td>\n",
+       "      <td>37.000000</td>\n",
+       "      <td>1013.500000</td>\n",
+       "      <td>1011.000000</td>\n",
+       "      <td>3.000000</td>\n",
+       "      <td>4.000000</td>\n",
+       "      <td>12.300000</td>\n",
+       "      <td>16.700000</td>\n",
+       "      <td>2011.000000</td>\n",
+       "      <td>3.000000</td>\n",
+       "      <td>8.000000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>50%</th>\n",
+       "      <td>12.000000</td>\n",
+       "      <td>22.600000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>4.800000</td>\n",
+       "      <td>8.500000</td>\n",
+       "      <td>39.000000</td>\n",
+       "      <td>13.000000</td>\n",
+       "      <td>19.000000</td>\n",
+       "      <td>70.000000</td>\n",
+       "      <td>52.000000</td>\n",
+       "      <td>1017.600000</td>\n",
+       "      <td>1015.200000</td>\n",
+       "      <td>5.000000</td>\n",
+       "      <td>5.000000</td>\n",
+       "      <td>16.700000</td>\n",
+       "      <td>21.100000</td>\n",
+       "      <td>2013.000000</td>\n",
+       "      <td>6.000000</td>\n",
+       "      <td>16.000000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>75%</th>\n",
+       "      <td>16.800000</td>\n",
+       "      <td>28.200000</td>\n",
+       "      <td>0.600000</td>\n",
+       "      <td>5.400000</td>\n",
+       "      <td>8.700000</td>\n",
+       "      <td>46.000000</td>\n",
+       "      <td>19.000000</td>\n",
+       "      <td>24.000000</td>\n",
+       "      <td>83.000000</td>\n",
+       "      <td>65.000000</td>\n",
+       "      <td>1021.800000</td>\n",
+       "      <td>1019.400000</td>\n",
+       "      <td>6.000000</td>\n",
+       "      <td>6.000000</td>\n",
+       "      <td>21.500000</td>\n",
+       "      <td>26.300000</td>\n",
+       "      <td>2015.000000</td>\n",
+       "      <td>9.000000</td>\n",
+       "      <td>23.000000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>max</th>\n",
+       "      <td>33.900000</td>\n",
+       "      <td>48.100000</td>\n",
+       "      <td>3.200000</td>\n",
+       "      <td>21.800000</td>\n",
+       "      <td>14.500000</td>\n",
+       "      <td>135.000000</td>\n",
+       "      <td>55.000000</td>\n",
+       "      <td>57.000000</td>\n",
+       "      <td>100.000000</td>\n",
+       "      <td>100.000000</td>\n",
+       "      <td>1041.000000</td>\n",
+       "      <td>1039.600000</td>\n",
+       "      <td>9.000000</td>\n",
+       "      <td>8.000000</td>\n",
+       "      <td>40.200000</td>\n",
+       "      <td>46.700000</td>\n",
+       "      <td>2017.000000</td>\n",
+       "      <td>12.000000</td>\n",
+       "      <td>31.000000</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "             MinTemp        MaxTemp       Rainfall    Evaporation  \\\n",
+       "count  113754.000000  113754.000000  113754.000000  113754.000000   \n",
+       "mean       12.193497      23.237216       0.675080       5.151606   \n",
+       "std         6.388279       7.094149       1.183837       2.823707   \n",
+       "min        -8.200000      -4.800000       0.000000       0.000000   \n",
+       "25%         7.600000      18.000000       0.000000       4.000000   \n",
+       "50%        12.000000      22.600000       0.000000       4.800000   \n",
+       "75%        16.800000      28.200000       0.600000       5.400000   \n",
+       "max        33.900000      48.100000       3.200000      21.800000   \n",
+       "\n",
+       "            Sunshine  WindGustSpeed   WindSpeed9am   WindSpeed3pm  \\\n",
+       "count  113754.000000  113754.000000  113754.000000  113754.000000   \n",
+       "mean        8.041154      39.884074      13.978155      18.614756   \n",
+       "std         2.769480      13.116959       8.806558       8.685862   \n",
+       "min         0.000000       6.000000       0.000000       0.000000   \n",
+       "25%         8.200000      31.000000       7.000000      13.000000   \n",
+       "50%         8.500000      39.000000      13.000000      19.000000   \n",
+       "75%         8.700000      46.000000      19.000000      24.000000   \n",
+       "max        14.500000     135.000000      55.000000      57.000000   \n",
+       "\n",
+       "         Humidity9am    Humidity3pm    Pressure9am    Pressure3pm  \\\n",
+       "count  113754.000000  113754.000000  113754.000000  113754.000000   \n",
+       "mean       68.867486      51.509547    1017.640649    1015.241101   \n",
+       "std        18.935587      20.530723       6.738680       6.675168   \n",
+       "min         0.000000       0.000000     980.500000     977.100000   \n",
+       "25%        57.000000      37.000000    1013.500000    1011.000000   \n",
+       "50%        70.000000      52.000000    1017.600000    1015.200000   \n",
+       "75%        83.000000      65.000000    1021.800000    1019.400000   \n",
+       "max       100.000000     100.000000    1041.000000    1039.600000   \n",
+       "\n",
+       "            Cloud9am       Cloud3pm        Temp9am        Temp3pm  \\\n",
+       "count  113754.000000  113754.000000  113754.000000  113754.000000   \n",
+       "mean        4.651801       4.703588      16.995062      21.688643   \n",
+       "std         2.292726       2.117847       6.463772       6.855649   \n",
+       "min         0.000000       0.000000      -7.200000      -5.400000   \n",
+       "25%         3.000000       4.000000      12.300000      16.700000   \n",
+       "50%         5.000000       5.000000      16.700000      21.100000   \n",
+       "75%         6.000000       6.000000      21.500000      26.300000   \n",
+       "max         9.000000       8.000000      40.200000      46.700000   \n",
+       "\n",
+       "                Year          Month            Day  \n",
+       "count  113754.000000  113754.000000  113754.000000  \n",
+       "mean     2012.759727       6.404021      15.710419  \n",
+       "std         2.540419       3.427798       8.796821  \n",
+       "min      2007.000000       1.000000       1.000000  \n",
+       "25%      2011.000000       3.000000       8.000000  \n",
+       "50%      2013.000000       6.000000      16.000000  \n",
+       "75%      2015.000000       9.000000      23.000000  \n",
+       "max      2017.000000      12.000000      31.000000  "
+      ]
+     },
+     "execution_count": 84,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "X_train[numerical].describe()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "We can now see that the outliers in `Rainfall`, `Evaporation`, `WindSpeed9am` and `WindSpeed3pm` columns are capped."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Encode categorical variables"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 85,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "['Location', 'WindGustDir', 'WindDir9am', 'WindDir3pm', 'RainToday']"
+      ]
+     },
+     "execution_count": 85,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "categorical"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 86,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>Location</th>\n",
+       "      <th>WindGustDir</th>\n",
+       "      <th>WindDir9am</th>\n",
+       "      <th>WindDir3pm</th>\n",
+       "      <th>RainToday</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>110803</th>\n",
+       "      <td>Witchcliffe</td>\n",
+       "      <td>S</td>\n",
+       "      <td>SSE</td>\n",
+       "      <td>S</td>\n",
+       "      <td>No</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>87289</th>\n",
+       "      <td>Cairns</td>\n",
+       "      <td>ENE</td>\n",
+       "      <td>SSE</td>\n",
+       "      <td>SE</td>\n",
+       "      <td>Yes</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>134949</th>\n",
+       "      <td>AliceSprings</td>\n",
+       "      <td>E</td>\n",
+       "      <td>NE</td>\n",
+       "      <td>N</td>\n",
+       "      <td>No</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>85553</th>\n",
+       "      <td>Cairns</td>\n",
+       "      <td>ESE</td>\n",
+       "      <td>SSE</td>\n",
+       "      <td>E</td>\n",
+       "      <td>No</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>16110</th>\n",
+       "      <td>Newcastle</td>\n",
+       "      <td>W</td>\n",
+       "      <td>N</td>\n",
+       "      <td>SE</td>\n",
+       "      <td>No</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "            Location WindGustDir WindDir9am WindDir3pm RainToday\n",
+       "110803   Witchcliffe           S        SSE          S        No\n",
+       "87289         Cairns         ENE        SSE         SE       Yes\n",
+       "134949  AliceSprings           E         NE          N        No\n",
+       "85553         Cairns         ESE        SSE          E        No\n",
+       "16110      Newcastle           W          N         SE        No"
+      ]
+     },
+     "execution_count": 86,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "X_train[categorical].head()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 87,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# encode RainToday variable\n",
+    "\n",
+    "import category_encoders as ce\n",
+    "\n",
+    "encoder = ce.BinaryEncoder(cols=['RainToday'])\n",
+    "\n",
+    "X_train = encoder.fit_transform(X_train)\n",
+    "\n",
+    "X_test = encoder.transform(X_test)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 88,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>RainToday_0</th>\n",
+       "      <th>RainToday_1</th>\n",
+       "      <th>Location</th>\n",
+       "      <th>MinTemp</th>\n",
+       "      <th>MaxTemp</th>\n",
+       "      <th>Rainfall</th>\n",
+       "      <th>Evaporation</th>\n",
+       "      <th>Sunshine</th>\n",
+       "      <th>WindGustDir</th>\n",
+       "      <th>WindGustSpeed</th>\n",
+       "      <th>...</th>\n",
+       "      <th>Humidity3pm</th>\n",
+       "      <th>Pressure9am</th>\n",
+       "      <th>Pressure3pm</th>\n",
+       "      <th>Cloud9am</th>\n",
+       "      <th>Cloud3pm</th>\n",
+       "      <th>Temp9am</th>\n",
+       "      <th>Temp3pm</th>\n",
+       "      <th>Year</th>\n",
+       "      <th>Month</th>\n",
+       "      <th>Day</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>110803</th>\n",
+       "      <td>0</td>\n",
+       "      <td>1</td>\n",
+       "      <td>Witchcliffe</td>\n",
+       "      <td>13.9</td>\n",
+       "      <td>22.6</td>\n",
+       "      <td>0.2</td>\n",
+       "      <td>4.8</td>\n",
+       "      <td>8.5</td>\n",
+       "      <td>S</td>\n",
+       "      <td>41.0</td>\n",
+       "      <td>...</td>\n",
+       "      <td>55.0</td>\n",
+       "      <td>1013.9</td>\n",
+       "      <td>1013.4</td>\n",
+       "      <td>5.0</td>\n",
+       "      <td>5.0</td>\n",
+       "      <td>18.8</td>\n",
+       "      <td>20.4</td>\n",
+       "      <td>2014</td>\n",
+       "      <td>4</td>\n",
+       "      <td>25</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>87289</th>\n",
+       "      <td>1</td>\n",
+       "      <td>0</td>\n",
+       "      <td>Cairns</td>\n",
+       "      <td>22.4</td>\n",
+       "      <td>29.4</td>\n",
+       "      <td>2.0</td>\n",
+       "      <td>6.0</td>\n",
+       "      <td>6.3</td>\n",
+       "      <td>ENE</td>\n",
+       "      <td>33.0</td>\n",
+       "      <td>...</td>\n",
+       "      <td>59.0</td>\n",
+       "      <td>1016.9</td>\n",
+       "      <td>1013.1</td>\n",
+       "      <td>7.0</td>\n",
+       "      <td>5.0</td>\n",
+       "      <td>26.4</td>\n",
+       "      <td>27.5</td>\n",
+       "      <td>2015</td>\n",
+       "      <td>11</td>\n",
+       "      <td>2</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>134949</th>\n",
+       "      <td>0</td>\n",
+       "      <td>1</td>\n",
+       "      <td>AliceSprings</td>\n",
+       "      <td>9.7</td>\n",
+       "      <td>36.2</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>11.4</td>\n",
+       "      <td>12.3</td>\n",
+       "      <td>E</td>\n",
+       "      <td>31.0</td>\n",
+       "      <td>...</td>\n",
+       "      <td>2.0</td>\n",
+       "      <td>1018.1</td>\n",
+       "      <td>1013.6</td>\n",
+       "      <td>1.0</td>\n",
+       "      <td>1.0</td>\n",
+       "      <td>28.5</td>\n",
+       "      <td>35.0</td>\n",
+       "      <td>2014</td>\n",
+       "      <td>10</td>\n",
+       "      <td>19</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>85553</th>\n",
+       "      <td>0</td>\n",
+       "      <td>1</td>\n",
+       "      <td>Cairns</td>\n",
+       "      <td>20.5</td>\n",
+       "      <td>30.1</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>8.8</td>\n",
+       "      <td>11.1</td>\n",
+       "      <td>ESE</td>\n",
+       "      <td>37.0</td>\n",
+       "      <td>...</td>\n",
+       "      <td>53.0</td>\n",
+       "      <td>1014.1</td>\n",
+       "      <td>1010.8</td>\n",
+       "      <td>2.0</td>\n",
+       "      <td>3.0</td>\n",
+       "      <td>27.3</td>\n",
+       "      <td>29.4</td>\n",
+       "      <td>2010</td>\n",
+       "      <td>10</td>\n",
+       "      <td>30</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>16110</th>\n",
+       "      <td>0</td>\n",
+       "      <td>1</td>\n",
+       "      <td>Newcastle</td>\n",
+       "      <td>16.8</td>\n",
+       "      <td>29.2</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>4.8</td>\n",
+       "      <td>8.5</td>\n",
+       "      <td>W</td>\n",
+       "      <td>39.0</td>\n",
+       "      <td>...</td>\n",
+       "      <td>53.0</td>\n",
+       "      <td>1017.6</td>\n",
+       "      <td>1015.2</td>\n",
+       "      <td>5.0</td>\n",
+       "      <td>8.0</td>\n",
+       "      <td>22.2</td>\n",
+       "      <td>27.0</td>\n",
+       "      <td>2012</td>\n",
+       "      <td>11</td>\n",
+       "      <td>8</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "<p>5 rows × 25 columns</p>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "        RainToday_0  RainToday_1      Location  MinTemp  MaxTemp  Rainfall  \\\n",
+       "110803            0            1   Witchcliffe     13.9     22.6       0.2   \n",
+       "87289             1            0        Cairns     22.4     29.4       2.0   \n",
+       "134949            0            1  AliceSprings      9.7     36.2       0.0   \n",
+       "85553             0            1        Cairns     20.5     30.1       0.0   \n",
+       "16110             0            1     Newcastle     16.8     29.2       0.0   \n",
+       "\n",
+       "        Evaporation  Sunshine WindGustDir  WindGustSpeed ...  Humidity3pm  \\\n",
+       "110803          4.8       8.5           S           41.0 ...         55.0   \n",
+       "87289           6.0       6.3         ENE           33.0 ...         59.0   \n",
+       "134949         11.4      12.3           E           31.0 ...          2.0   \n",
+       "85553           8.8      11.1         ESE           37.0 ...         53.0   \n",
+       "16110           4.8       8.5           W           39.0 ...         53.0   \n",
+       "\n",
+       "       Pressure9am  Pressure3pm  Cloud9am  Cloud3pm  Temp9am  Temp3pm  Year  \\\n",
+       "110803      1013.9       1013.4       5.0       5.0     18.8     20.4  2014   \n",
+       "87289       1016.9       1013.1       7.0       5.0     26.4     27.5  2015   \n",
+       "134949      1018.1       1013.6       1.0       1.0     28.5     35.0  2014   \n",
+       "85553       1014.1       1010.8       2.0       3.0     27.3     29.4  2010   \n",
+       "16110       1017.6       1015.2       5.0       8.0     22.2     27.0  2012   \n",
+       "\n",
+       "        Month  Day  \n",
+       "110803      4   25  \n",
+       "87289      11    2  \n",
+       "134949     10   19  \n",
+       "85553      10   30  \n",
+       "16110      11    8  \n",
+       "\n",
+       "[5 rows x 25 columns]"
+      ]
+     },
+     "execution_count": 88,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "X_train.head()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "We can see that two additional variables `RainToday_0` and `RainToday_1` are created from `RainToday` variable.\n",
+    "\n",
+    "Now, I will create the `X_train` training set."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 89,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "X_train = pd.concat([X_train[numerical], X_train[['RainToday_0', 'RainToday_1']],\n",
+    "                     pd.get_dummies(X_train.Location), \n",
+    "                     pd.get_dummies(X_train.WindGustDir),\n",
+    "                     pd.get_dummies(X_train.WindDir9am),\n",
+    "                     pd.get_dummies(X_train.WindDir3pm)], axis=1)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 90,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>MinTemp</th>\n",
+       "      <th>MaxTemp</th>\n",
+       "      <th>Rainfall</th>\n",
+       "      <th>Evaporation</th>\n",
+       "      <th>Sunshine</th>\n",
+       "      <th>WindGustSpeed</th>\n",
+       "      <th>WindSpeed9am</th>\n",
+       "      <th>WindSpeed3pm</th>\n",
+       "      <th>Humidity9am</th>\n",
+       "      <th>Humidity3pm</th>\n",
+       "      <th>...</th>\n",
+       "      <th>NNW</th>\n",
+       "      <th>NW</th>\n",
+       "      <th>S</th>\n",
+       "      <th>SE</th>\n",
+       "      <th>SSE</th>\n",
+       "      <th>SSW</th>\n",
+       "      <th>SW</th>\n",
+       "      <th>W</th>\n",
+       "      <th>WNW</th>\n",
+       "      <th>WSW</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>110803</th>\n",
+       "      <td>13.9</td>\n",
+       "      <td>22.6</td>\n",
+       "      <td>0.2</td>\n",
+       "      <td>4.8</td>\n",
+       "      <td>8.5</td>\n",
+       "      <td>41.0</td>\n",
+       "      <td>20.0</td>\n",
+       "      <td>28.0</td>\n",
+       "      <td>65.0</td>\n",
+       "      <td>55.0</td>\n",
+       "      <td>...</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>1</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>87289</th>\n",
+       "      <td>22.4</td>\n",
+       "      <td>29.4</td>\n",
+       "      <td>2.0</td>\n",
+       "      <td>6.0</td>\n",
+       "      <td>6.3</td>\n",
+       "      <td>33.0</td>\n",
+       "      <td>7.0</td>\n",
+       "      <td>19.0</td>\n",
+       "      <td>71.0</td>\n",
+       "      <td>59.0</td>\n",
+       "      <td>...</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>1</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>134949</th>\n",
+       "      <td>9.7</td>\n",
+       "      <td>36.2</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>11.4</td>\n",
+       "      <td>12.3</td>\n",
+       "      <td>31.0</td>\n",
+       "      <td>15.0</td>\n",
+       "      <td>11.0</td>\n",
+       "      <td>6.0</td>\n",
+       "      <td>2.0</td>\n",
+       "      <td>...</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>85553</th>\n",
+       "      <td>20.5</td>\n",
+       "      <td>30.1</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>8.8</td>\n",
+       "      <td>11.1</td>\n",
+       "      <td>37.0</td>\n",
+       "      <td>22.0</td>\n",
+       "      <td>19.0</td>\n",
+       "      <td>59.0</td>\n",
+       "      <td>53.0</td>\n",
+       "      <td>...</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>16110</th>\n",
+       "      <td>16.8</td>\n",
+       "      <td>29.2</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>4.8</td>\n",
+       "      <td>8.5</td>\n",
+       "      <td>39.0</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>7.0</td>\n",
+       "      <td>72.0</td>\n",
+       "      <td>53.0</td>\n",
+       "      <td>...</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>1</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "<p>5 rows × 118 columns</p>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "        MinTemp  MaxTemp  Rainfall  Evaporation  Sunshine  WindGustSpeed  \\\n",
+       "110803     13.9     22.6       0.2          4.8       8.5           41.0   \n",
+       "87289      22.4     29.4       2.0          6.0       6.3           33.0   \n",
+       "134949      9.7     36.2       0.0         11.4      12.3           31.0   \n",
+       "85553      20.5     30.1       0.0          8.8      11.1           37.0   \n",
+       "16110      16.8     29.2       0.0          4.8       8.5           39.0   \n",
+       "\n",
+       "        WindSpeed9am  WindSpeed3pm  Humidity9am  Humidity3pm ...   NNW  NW  S  \\\n",
+       "110803          20.0          28.0         65.0         55.0 ...     0   0  1   \n",
+       "87289            7.0          19.0         71.0         59.0 ...     0   0  0   \n",
+       "134949          15.0          11.0          6.0          2.0 ...     0   0  0   \n",
+       "85553           22.0          19.0         59.0         53.0 ...     0   0  0   \n",
+       "16110            0.0           7.0         72.0         53.0 ...     0   0  0   \n",
+       "\n",
+       "        SE  SSE  SSW  SW  W  WNW  WSW  \n",
+       "110803   0    0    0   0  0    0    0  \n",
+       "87289    1    0    0   0  0    0    0  \n",
+       "134949   0    0    0   0  0    0    0  \n",
+       "85553    0    0    0   0  0    0    0  \n",
+       "16110    1    0    0   0  0    0    0  \n",
+       "\n",
+       "[5 rows x 118 columns]"
+      ]
+     },
+     "execution_count": 90,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "X_train.head()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Similarly, I will create the `X_test` testing set."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 91,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "X_test = pd.concat([X_test[numerical], X_test[['RainToday_0', 'RainToday_1']],\n",
+    "                     pd.get_dummies(X_test.Location), \n",
+    "                     pd.get_dummies(X_test.WindGustDir),\n",
+    "                     pd.get_dummies(X_test.WindDir9am),\n",
+    "                     pd.get_dummies(X_test.WindDir3pm)], axis=1)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 92,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>MinTemp</th>\n",
+       "      <th>MaxTemp</th>\n",
+       "      <th>Rainfall</th>\n",
+       "      <th>Evaporation</th>\n",
+       "      <th>Sunshine</th>\n",
+       "      <th>WindGustSpeed</th>\n",
+       "      <th>WindSpeed9am</th>\n",
+       "      <th>WindSpeed3pm</th>\n",
+       "      <th>Humidity9am</th>\n",
+       "      <th>Humidity3pm</th>\n",
+       "      <th>...</th>\n",
+       "      <th>NNW</th>\n",
+       "      <th>NW</th>\n",
+       "      <th>S</th>\n",
+       "      <th>SE</th>\n",
+       "      <th>SSE</th>\n",
+       "      <th>SSW</th>\n",
+       "      <th>SW</th>\n",
+       "      <th>W</th>\n",
+       "      <th>WNW</th>\n",
+       "      <th>WSW</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>86232</th>\n",
+       "      <td>17.4</td>\n",
+       "      <td>29.0</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>3.6</td>\n",
+       "      <td>11.1</td>\n",
+       "      <td>33.0</td>\n",
+       "      <td>11.0</td>\n",
+       "      <td>19.0</td>\n",
+       "      <td>63.0</td>\n",
+       "      <td>61.0</td>\n",
+       "      <td>...</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>57576</th>\n",
+       "      <td>6.8</td>\n",
+       "      <td>14.4</td>\n",
+       "      <td>0.8</td>\n",
+       "      <td>0.8</td>\n",
+       "      <td>8.5</td>\n",
+       "      <td>46.0</td>\n",
+       "      <td>17.0</td>\n",
+       "      <td>22.0</td>\n",
+       "      <td>80.0</td>\n",
+       "      <td>55.0</td>\n",
+       "      <td>...</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>1</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>124071</th>\n",
+       "      <td>10.1</td>\n",
+       "      <td>15.4</td>\n",
+       "      <td>3.2</td>\n",
+       "      <td>4.8</td>\n",
+       "      <td>8.5</td>\n",
+       "      <td>31.0</td>\n",
+       "      <td>13.0</td>\n",
+       "      <td>9.0</td>\n",
+       "      <td>70.0</td>\n",
+       "      <td>61.0</td>\n",
+       "      <td>...</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>1</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>117955</th>\n",
+       "      <td>14.4</td>\n",
+       "      <td>33.4</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>8.0</td>\n",
+       "      <td>11.6</td>\n",
+       "      <td>41.0</td>\n",
+       "      <td>9.0</td>\n",
+       "      <td>17.0</td>\n",
+       "      <td>40.0</td>\n",
+       "      <td>23.0</td>\n",
+       "      <td>...</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>1</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>133468</th>\n",
+       "      <td>6.8</td>\n",
+       "      <td>14.3</td>\n",
+       "      <td>3.2</td>\n",
+       "      <td>0.2</td>\n",
+       "      <td>7.3</td>\n",
+       "      <td>28.0</td>\n",
+       "      <td>15.0</td>\n",
+       "      <td>13.0</td>\n",
+       "      <td>92.0</td>\n",
+       "      <td>47.0</td>\n",
+       "      <td>...</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "<p>5 rows × 118 columns</p>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "        MinTemp  MaxTemp  Rainfall  Evaporation  Sunshine  WindGustSpeed  \\\n",
+       "86232      17.4     29.0       0.0          3.6      11.1           33.0   \n",
+       "57576       6.8     14.4       0.8          0.8       8.5           46.0   \n",
+       "124071     10.1     15.4       3.2          4.8       8.5           31.0   \n",
+       "117955     14.4     33.4       0.0          8.0      11.6           41.0   \n",
+       "133468      6.8     14.3       3.2          0.2       7.3           28.0   \n",
+       "\n",
+       "        WindSpeed9am  WindSpeed3pm  Humidity9am  Humidity3pm ...   NNW  NW  S  \\\n",
+       "86232           11.0          19.0         63.0         61.0 ...     0   0  0   \n",
+       "57576           17.0          22.0         80.0         55.0 ...     0   0  1   \n",
+       "124071          13.0           9.0         70.0         61.0 ...     0   0  0   \n",
+       "117955           9.0          17.0         40.0         23.0 ...     0   0  0   \n",
+       "133468          15.0          13.0         92.0         47.0 ...     0   0  0   \n",
+       "\n",
+       "        SE  SSE  SSW  SW  W  WNW  WSW  \n",
+       "86232    0    0    0   0  0    0    0  \n",
+       "57576    0    0    0   0  0    0    0  \n",
+       "124071   0    1    0   0  0    0    0  \n",
+       "117955   0    0    0   1  0    0    0  \n",
+       "133468   0    0    0   0  0    0    0  \n",
+       "\n",
+       "[5 rows x 118 columns]"
+      ]
+     },
+     "execution_count": 92,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "X_test.head()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "We now have training and testing set ready for model building. Before that, we should map all the feature variables onto the same scale. It is called `feature scaling`. I will do it as follows."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## 11. Feature Scaling"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 93,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>MinTemp</th>\n",
+       "      <th>MaxTemp</th>\n",
+       "      <th>Rainfall</th>\n",
+       "      <th>Evaporation</th>\n",
+       "      <th>Sunshine</th>\n",
+       "      <th>WindGustSpeed</th>\n",
+       "      <th>WindSpeed9am</th>\n",
+       "      <th>WindSpeed3pm</th>\n",
+       "      <th>Humidity9am</th>\n",
+       "      <th>Humidity3pm</th>\n",
+       "      <th>...</th>\n",
+       "      <th>NNW</th>\n",
+       "      <th>NW</th>\n",
+       "      <th>S</th>\n",
+       "      <th>SE</th>\n",
+       "      <th>SSE</th>\n",
+       "      <th>SSW</th>\n",
+       "      <th>SW</th>\n",
+       "      <th>W</th>\n",
+       "      <th>WNW</th>\n",
+       "      <th>WSW</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>count</th>\n",
+       "      <td>113754.000000</td>\n",
+       "      <td>113754.000000</td>\n",
+       "      <td>113754.000000</td>\n",
+       "      <td>113754.000000</td>\n",
+       "      <td>113754.000000</td>\n",
+       "      <td>113754.000000</td>\n",
+       "      <td>113754.000000</td>\n",
+       "      <td>113754.000000</td>\n",
+       "      <td>113754.000000</td>\n",
+       "      <td>113754.000000</td>\n",
+       "      <td>...</td>\n",
+       "      <td>113754.000000</td>\n",
+       "      <td>113754.000000</td>\n",
+       "      <td>113754.000000</td>\n",
+       "      <td>113754.000000</td>\n",
+       "      <td>113754.000000</td>\n",
+       "      <td>113754.000000</td>\n",
+       "      <td>113754.000000</td>\n",
+       "      <td>113754.000000</td>\n",
+       "      <td>113754.000000</td>\n",
+       "      <td>113754.000000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>mean</th>\n",
+       "      <td>12.193497</td>\n",
+       "      <td>23.237216</td>\n",
+       "      <td>0.675080</td>\n",
+       "      <td>5.151606</td>\n",
+       "      <td>8.041154</td>\n",
+       "      <td>39.884074</td>\n",
+       "      <td>13.978155</td>\n",
+       "      <td>18.614756</td>\n",
+       "      <td>68.867486</td>\n",
+       "      <td>51.509547</td>\n",
+       "      <td>...</td>\n",
+       "      <td>0.054530</td>\n",
+       "      <td>0.060288</td>\n",
+       "      <td>0.067259</td>\n",
+       "      <td>0.101605</td>\n",
+       "      <td>0.064059</td>\n",
+       "      <td>0.056402</td>\n",
+       "      <td>0.064464</td>\n",
+       "      <td>0.069334</td>\n",
+       "      <td>0.060798</td>\n",
+       "      <td>0.065483</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>std</th>\n",
+       "      <td>6.388279</td>\n",
+       "      <td>7.094149</td>\n",
+       "      <td>1.183837</td>\n",
+       "      <td>2.823707</td>\n",
+       "      <td>2.769480</td>\n",
+       "      <td>13.116959</td>\n",
+       "      <td>8.806558</td>\n",
+       "      <td>8.685862</td>\n",
+       "      <td>18.935587</td>\n",
+       "      <td>20.530723</td>\n",
+       "      <td>...</td>\n",
+       "      <td>0.227061</td>\n",
+       "      <td>0.238021</td>\n",
+       "      <td>0.250471</td>\n",
+       "      <td>0.302130</td>\n",
+       "      <td>0.244860</td>\n",
+       "      <td>0.230698</td>\n",
+       "      <td>0.245578</td>\n",
+       "      <td>0.254022</td>\n",
+       "      <td>0.238960</td>\n",
+       "      <td>0.247378</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>min</th>\n",
+       "      <td>-8.200000</td>\n",
+       "      <td>-4.800000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>6.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>...</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>25%</th>\n",
+       "      <td>7.600000</td>\n",
+       "      <td>18.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>4.000000</td>\n",
+       "      <td>8.200000</td>\n",
+       "      <td>31.000000</td>\n",
+       "      <td>7.000000</td>\n",
+       "      <td>13.000000</td>\n",
+       "      <td>57.000000</td>\n",
+       "      <td>37.000000</td>\n",
+       "      <td>...</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>50%</th>\n",
+       "      <td>12.000000</td>\n",
+       "      <td>22.600000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>4.800000</td>\n",
+       "      <td>8.500000</td>\n",
+       "      <td>39.000000</td>\n",
+       "      <td>13.000000</td>\n",
+       "      <td>19.000000</td>\n",
+       "      <td>70.000000</td>\n",
+       "      <td>52.000000</td>\n",
+       "      <td>...</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>75%</th>\n",
+       "      <td>16.800000</td>\n",
+       "      <td>28.200000</td>\n",
+       "      <td>0.600000</td>\n",
+       "      <td>5.400000</td>\n",
+       "      <td>8.700000</td>\n",
+       "      <td>46.000000</td>\n",
+       "      <td>19.000000</td>\n",
+       "      <td>24.000000</td>\n",
+       "      <td>83.000000</td>\n",
+       "      <td>65.000000</td>\n",
+       "      <td>...</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>max</th>\n",
+       "      <td>33.900000</td>\n",
+       "      <td>48.100000</td>\n",
+       "      <td>3.200000</td>\n",
+       "      <td>21.800000</td>\n",
+       "      <td>14.500000</td>\n",
+       "      <td>135.000000</td>\n",
+       "      <td>55.000000</td>\n",
+       "      <td>57.000000</td>\n",
+       "      <td>100.000000</td>\n",
+       "      <td>100.000000</td>\n",
+       "      <td>...</td>\n",
+       "      <td>1.000000</td>\n",
+       "      <td>1.000000</td>\n",
+       "      <td>1.000000</td>\n",
+       "      <td>1.000000</td>\n",
+       "      <td>1.000000</td>\n",
+       "      <td>1.000000</td>\n",
+       "      <td>1.000000</td>\n",
+       "      <td>1.000000</td>\n",
+       "      <td>1.000000</td>\n",
+       "      <td>1.000000</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "<p>8 rows × 118 columns</p>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "             MinTemp        MaxTemp       Rainfall    Evaporation  \\\n",
+       "count  113754.000000  113754.000000  113754.000000  113754.000000   \n",
+       "mean       12.193497      23.237216       0.675080       5.151606   \n",
+       "std         6.388279       7.094149       1.183837       2.823707   \n",
+       "min        -8.200000      -4.800000       0.000000       0.000000   \n",
+       "25%         7.600000      18.000000       0.000000       4.000000   \n",
+       "50%        12.000000      22.600000       0.000000       4.800000   \n",
+       "75%        16.800000      28.200000       0.600000       5.400000   \n",
+       "max        33.900000      48.100000       3.200000      21.800000   \n",
+       "\n",
+       "            Sunshine  WindGustSpeed   WindSpeed9am   WindSpeed3pm  \\\n",
+       "count  113754.000000  113754.000000  113754.000000  113754.000000   \n",
+       "mean        8.041154      39.884074      13.978155      18.614756   \n",
+       "std         2.769480      13.116959       8.806558       8.685862   \n",
+       "min         0.000000       6.000000       0.000000       0.000000   \n",
+       "25%         8.200000      31.000000       7.000000      13.000000   \n",
+       "50%         8.500000      39.000000      13.000000      19.000000   \n",
+       "75%         8.700000      46.000000      19.000000      24.000000   \n",
+       "max        14.500000     135.000000      55.000000      57.000000   \n",
+       "\n",
+       "         Humidity9am    Humidity3pm      ...                  NNW  \\\n",
+       "count  113754.000000  113754.000000      ...        113754.000000   \n",
+       "mean       68.867486      51.509547      ...             0.054530   \n",
+       "std        18.935587      20.530723      ...             0.227061   \n",
+       "min         0.000000       0.000000      ...             0.000000   \n",
+       "25%        57.000000      37.000000      ...             0.000000   \n",
+       "50%        70.000000      52.000000      ...             0.000000   \n",
+       "75%        83.000000      65.000000      ...             0.000000   \n",
+       "max       100.000000     100.000000      ...             1.000000   \n",
+       "\n",
+       "                  NW              S             SE            SSE  \\\n",
+       "count  113754.000000  113754.000000  113754.000000  113754.000000   \n",
+       "mean        0.060288       0.067259       0.101605       0.064059   \n",
+       "std         0.238021       0.250471       0.302130       0.244860   \n",
+       "min         0.000000       0.000000       0.000000       0.000000   \n",
+       "25%         0.000000       0.000000       0.000000       0.000000   \n",
+       "50%         0.000000       0.000000       0.000000       0.000000   \n",
+       "75%         0.000000       0.000000       0.000000       0.000000   \n",
+       "max         1.000000       1.000000       1.000000       1.000000   \n",
+       "\n",
+       "                 SSW             SW              W            WNW  \\\n",
+       "count  113754.000000  113754.000000  113754.000000  113754.000000   \n",
+       "mean        0.056402       0.064464       0.069334       0.060798   \n",
+       "std         0.230698       0.245578       0.254022       0.238960   \n",
+       "min         0.000000       0.000000       0.000000       0.000000   \n",
+       "25%         0.000000       0.000000       0.000000       0.000000   \n",
+       "50%         0.000000       0.000000       0.000000       0.000000   \n",
+       "75%         0.000000       0.000000       0.000000       0.000000   \n",
+       "max         1.000000       1.000000       1.000000       1.000000   \n",
+       "\n",
+       "                 WSW  \n",
+       "count  113754.000000  \n",
+       "mean        0.065483  \n",
+       "std         0.247378  \n",
+       "min         0.000000  \n",
+       "25%         0.000000  \n",
+       "50%         0.000000  \n",
+       "75%         0.000000  \n",
+       "max         1.000000  \n",
+       "\n",
+       "[8 rows x 118 columns]"
+      ]
+     },
+     "execution_count": 93,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "X_train.describe()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 94,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "cols = X_train.columns"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 95,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from sklearn.preprocessing import MinMaxScaler\n",
+    "\n",
+    "scaler = MinMaxScaler()\n",
+    "\n",
+    "X_train = scaler.fit_transform(X_train)\n",
+    "\n",
+    "X_test = scaler.transform(X_test)\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 96,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "X_train = pd.DataFrame(X_train, columns=[cols])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 97,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "X_test = pd.DataFrame(X_test, columns=[cols])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 98,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead tr th {\n",
+       "        text-align: left;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr>\n",
+       "      <th></th>\n",
+       "      <th>MinTemp</th>\n",
+       "      <th>MaxTemp</th>\n",
+       "      <th>Rainfall</th>\n",
+       "      <th>Evaporation</th>\n",
+       "      <th>Sunshine</th>\n",
+       "      <th>WindGustSpeed</th>\n",
+       "      <th>WindSpeed9am</th>\n",
+       "      <th>WindSpeed3pm</th>\n",
+       "      <th>Humidity9am</th>\n",
+       "      <th>Humidity3pm</th>\n",
+       "      <th>...</th>\n",
+       "      <th>NNW</th>\n",
+       "      <th>NW</th>\n",
+       "      <th>S</th>\n",
+       "      <th>SE</th>\n",
+       "      <th>SSE</th>\n",
+       "      <th>SSW</th>\n",
+       "      <th>SW</th>\n",
+       "      <th>W</th>\n",
+       "      <th>WNW</th>\n",
+       "      <th>WSW</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>count</th>\n",
+       "      <td>113754.000000</td>\n",
+       "      <td>113754.000000</td>\n",
+       "      <td>113754.000000</td>\n",
+       "      <td>113754.000000</td>\n",
+       "      <td>113754.000000</td>\n",
+       "      <td>113754.000000</td>\n",
+       "      <td>113754.000000</td>\n",
+       "      <td>113754.000000</td>\n",
+       "      <td>113754.000000</td>\n",
+       "      <td>113754.000000</td>\n",
+       "      <td>...</td>\n",
+       "      <td>113754.000000</td>\n",
+       "      <td>113754.000000</td>\n",
+       "      <td>113754.000000</td>\n",
+       "      <td>113754.000000</td>\n",
+       "      <td>113754.000000</td>\n",
+       "      <td>113754.000000</td>\n",
+       "      <td>113754.000000</td>\n",
+       "      <td>113754.000000</td>\n",
+       "      <td>113754.000000</td>\n",
+       "      <td>113754.000000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>mean</th>\n",
+       "      <td>0.484406</td>\n",
+       "      <td>0.530004</td>\n",
+       "      <td>0.210962</td>\n",
+       "      <td>0.236312</td>\n",
+       "      <td>0.554562</td>\n",
+       "      <td>0.262667</td>\n",
+       "      <td>0.254148</td>\n",
+       "      <td>0.326575</td>\n",
+       "      <td>0.688675</td>\n",
+       "      <td>0.515095</td>\n",
+       "      <td>...</td>\n",
+       "      <td>0.054530</td>\n",
+       "      <td>0.060288</td>\n",
+       "      <td>0.067259</td>\n",
+       "      <td>0.101605</td>\n",
+       "      <td>0.064059</td>\n",
+       "      <td>0.056402</td>\n",
+       "      <td>0.064464</td>\n",
+       "      <td>0.069334</td>\n",
+       "      <td>0.060798</td>\n",
+       "      <td>0.065483</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>std</th>\n",
+       "      <td>0.151741</td>\n",
+       "      <td>0.134105</td>\n",
+       "      <td>0.369949</td>\n",
+       "      <td>0.129528</td>\n",
+       "      <td>0.190999</td>\n",
+       "      <td>0.101682</td>\n",
+       "      <td>0.160119</td>\n",
+       "      <td>0.152384</td>\n",
+       "      <td>0.189356</td>\n",
+       "      <td>0.205307</td>\n",
+       "      <td>...</td>\n",
+       "      <td>0.227061</td>\n",
+       "      <td>0.238021</td>\n",
+       "      <td>0.250471</td>\n",
+       "      <td>0.302130</td>\n",
+       "      <td>0.244860</td>\n",
+       "      <td>0.230698</td>\n",
+       "      <td>0.245578</td>\n",
+       "      <td>0.254022</td>\n",
+       "      <td>0.238960</td>\n",
+       "      <td>0.247378</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>min</th>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>...</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>25%</th>\n",
+       "      <td>0.375297</td>\n",
+       "      <td>0.431002</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.183486</td>\n",
+       "      <td>0.565517</td>\n",
+       "      <td>0.193798</td>\n",
+       "      <td>0.127273</td>\n",
+       "      <td>0.228070</td>\n",
+       "      <td>0.570000</td>\n",
+       "      <td>0.370000</td>\n",
+       "      <td>...</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>50%</th>\n",
+       "      <td>0.479810</td>\n",
+       "      <td>0.517958</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.220183</td>\n",
+       "      <td>0.586207</td>\n",
+       "      <td>0.255814</td>\n",
+       "      <td>0.236364</td>\n",
+       "      <td>0.333333</td>\n",
+       "      <td>0.700000</td>\n",
+       "      <td>0.520000</td>\n",
+       "      <td>...</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>75%</th>\n",
+       "      <td>0.593824</td>\n",
+       "      <td>0.623819</td>\n",
+       "      <td>0.187500</td>\n",
+       "      <td>0.247706</td>\n",
+       "      <td>0.600000</td>\n",
+       "      <td>0.310078</td>\n",
+       "      <td>0.345455</td>\n",
+       "      <td>0.421053</td>\n",
+       "      <td>0.830000</td>\n",
+       "      <td>0.650000</td>\n",
+       "      <td>...</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>max</th>\n",
+       "      <td>1.000000</td>\n",
+       "      <td>1.000000</td>\n",
+       "      <td>1.000000</td>\n",
+       "      <td>1.000000</td>\n",
+       "      <td>1.000000</td>\n",
+       "      <td>1.000000</td>\n",
+       "      <td>1.000000</td>\n",
+       "      <td>1.000000</td>\n",
+       "      <td>1.000000</td>\n",
+       "      <td>1.000000</td>\n",
+       "      <td>...</td>\n",
+       "      <td>1.000000</td>\n",
+       "      <td>1.000000</td>\n",
+       "      <td>1.000000</td>\n",
+       "      <td>1.000000</td>\n",
+       "      <td>1.000000</td>\n",
+       "      <td>1.000000</td>\n",
+       "      <td>1.000000</td>\n",
+       "      <td>1.000000</td>\n",
+       "      <td>1.000000</td>\n",
+       "      <td>1.000000</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "<p>8 rows × 118 columns</p>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "             MinTemp        MaxTemp       Rainfall    Evaporation  \\\n",
+       "count  113754.000000  113754.000000  113754.000000  113754.000000   \n",
+       "mean        0.484406       0.530004       0.210962       0.236312   \n",
+       "std         0.151741       0.134105       0.369949       0.129528   \n",
+       "min         0.000000       0.000000       0.000000       0.000000   \n",
+       "25%         0.375297       0.431002       0.000000       0.183486   \n",
+       "50%         0.479810       0.517958       0.000000       0.220183   \n",
+       "75%         0.593824       0.623819       0.187500       0.247706   \n",
+       "max         1.000000       1.000000       1.000000       1.000000   \n",
+       "\n",
+       "            Sunshine  WindGustSpeed   WindSpeed9am   WindSpeed3pm  \\\n",
+       "count  113754.000000  113754.000000  113754.000000  113754.000000   \n",
+       "mean        0.554562       0.262667       0.254148       0.326575   \n",
+       "std         0.190999       0.101682       0.160119       0.152384   \n",
+       "min         0.000000       0.000000       0.000000       0.000000   \n",
+       "25%         0.565517       0.193798       0.127273       0.228070   \n",
+       "50%         0.586207       0.255814       0.236364       0.333333   \n",
+       "75%         0.600000       0.310078       0.345455       0.421053   \n",
+       "max         1.000000       1.000000       1.000000       1.000000   \n",
+       "\n",
+       "         Humidity9am    Humidity3pm      ...                  NNW  \\\n",
+       "count  113754.000000  113754.000000      ...        113754.000000   \n",
+       "mean        0.688675       0.515095      ...             0.054530   \n",
+       "std         0.189356       0.205307      ...             0.227061   \n",
+       "min         0.000000       0.000000      ...             0.000000   \n",
+       "25%         0.570000       0.370000      ...             0.000000   \n",
+       "50%         0.700000       0.520000      ...             0.000000   \n",
+       "75%         0.830000       0.650000      ...             0.000000   \n",
+       "max         1.000000       1.000000      ...             1.000000   \n",
+       "\n",
+       "                  NW              S             SE            SSE  \\\n",
+       "count  113754.000000  113754.000000  113754.000000  113754.000000   \n",
+       "mean        0.060288       0.067259       0.101605       0.064059   \n",
+       "std         0.238021       0.250471       0.302130       0.244860   \n",
+       "min         0.000000       0.000000       0.000000       0.000000   \n",
+       "25%         0.000000       0.000000       0.000000       0.000000   \n",
+       "50%         0.000000       0.000000       0.000000       0.000000   \n",
+       "75%         0.000000       0.000000       0.000000       0.000000   \n",
+       "max         1.000000       1.000000       1.000000       1.000000   \n",
+       "\n",
+       "                 SSW             SW              W            WNW  \\\n",
+       "count  113754.000000  113754.000000  113754.000000  113754.000000   \n",
+       "mean        0.056402       0.064464       0.069334       0.060798   \n",
+       "std         0.230698       0.245578       0.254022       0.238960   \n",
+       "min         0.000000       0.000000       0.000000       0.000000   \n",
+       "25%         0.000000       0.000000       0.000000       0.000000   \n",
+       "50%         0.000000       0.000000       0.000000       0.000000   \n",
+       "75%         0.000000       0.000000       0.000000       0.000000   \n",
+       "max         1.000000       1.000000       1.000000       1.000000   \n",
+       "\n",
+       "                 WSW  \n",
+       "count  113754.000000  \n",
+       "mean        0.065483  \n",
+       "std         0.247378  \n",
+       "min         0.000000  \n",
+       "25%         0.000000  \n",
+       "50%         0.000000  \n",
+       "75%         0.000000  \n",
+       "max         1.000000  \n",
+       "\n",
+       "[8 rows x 118 columns]"
+      ]
+     },
+     "execution_count": 98,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "X_train.describe()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "We now have `X_train` dataset ready to be fed into the Logistic Regression classifier. I will do it as follows."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## 12. Model training"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 99,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "LogisticRegression(C=1.0, class_weight=None, dual=False, fit_intercept=True,\n",
+       "          intercept_scaling=1, max_iter=100, multi_class='warn',\n",
+       "          n_jobs=None, penalty='l2', random_state=0, solver='liblinear',\n",
+       "          tol=0.0001, verbose=0, warm_start=False)"
+      ]
+     },
+     "execution_count": 99,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# train a logistic regression model on the training set\n",
+    "from sklearn.linear_model import LogisticRegression\n",
+    "\n",
+    "\n",
+    "# instantiate the model\n",
+    "logreg = LogisticRegression(solver='liblinear', random_state=0)\n",
+    "\n",
+    "\n",
+    "# fit the model\n",
+    "logreg.fit(X_train, y_train)\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## 13. Predict results"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 100,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "array(['No', 'No', 'No', ..., 'No', 'No', 'Yes'], dtype=object)"
+      ]
+     },
+     "execution_count": 100,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "y_pred_test = logreg.predict(X_test)\n",
+    "\n",
+    "y_pred_test"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### predict_proba method\n",
+    "\n",
+    "\n",
+    "**predict_proba** method gives the probabilities for the target variable(0 and 1) in this case, in array form.\n",
+    "\n",
+    "`0 is for probability of no rain` and `1 is for probability of rain.`"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 101,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "array([0.91387232, 0.83563172, 0.82035588, ..., 0.97674036, 0.7985333 ,\n",
+       "       0.3073458 ])"
+      ]
+     },
+     "execution_count": 101,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# probability of getting output as 0 - no rain\n",
+    "\n",
+    "logreg.predict_proba(X_test)[:,0]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 102,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "array([0.08612768, 0.16436828, 0.17964412, ..., 0.02325964, 0.2014667 ,\n",
+       "       0.6926542 ])"
+      ]
+     },
+     "execution_count": 102,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# probability of getting output as 1 - rain\n",
+    "\n",
+    "logreg.predict_proba(X_test)[:,1]"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## 14. Check accuracy score"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 103,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Model accuracy score: 0.8501\n"
+     ]
+    }
+   ],
+   "source": [
+    "from sklearn.metrics import accuracy_score\n",
+    "\n",
+    "print('Model accuracy score: {0:0.4f}'. format(accuracy_score(y_test, y_pred_test)))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Here, **y_test** are the true class labels and **y_pred_test** are the predicted class labels in the test-set."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Compare the train-set and test-set accuracy\n",
+    "\n",
+    "\n",
+    "Now, I will compare the train-set and test-set accuracy to check for overfitting."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 104,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "array(['No', 'No', 'No', ..., 'No', 'No', 'No'], dtype=object)"
+      ]
+     },
+     "execution_count": 104,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "y_pred_train = logreg.predict(X_train)\n",
+    "\n",
+    "y_pred_train"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 105,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Training-set accuracy score: 0.8476\n"
+     ]
+    }
+   ],
+   "source": [
+    "print('Training-set accuracy score: {0:0.4f}'. format(accuracy_score(y_train, y_pred_train)))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Check for overfitting and underfitting"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 106,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Training set score: 0.8476\n",
+      "Test set score: 0.8501\n"
+     ]
+    }
+   ],
+   "source": [
+    "# print the scores on training and test set\n",
+    "\n",
+    "print('Training set score: {:.4f}'.format(logreg.score(X_train, y_train)))\n",
+    "\n",
+    "print('Test set score: {:.4f}'.format(logreg.score(X_test, y_test)))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The training-set accuracy score is 0.8476 while the test-set accuracy to be 0.8501. These two values are quite comparable. So, there is no question of overfitting. \n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "In Logistic Regression, we use default value of C = 1. It provides good performance with approximately 85% accuracy on both the training and the test set. But the model performance on both the training and test set are very comparable. It is likely the case of underfitting. \n",
+    "\n",
+    "I will increase C and fit a more flexible model."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 107,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "LogisticRegression(C=100, class_weight=None, dual=False, fit_intercept=True,\n",
+       "          intercept_scaling=1, max_iter=100, multi_class='warn',\n",
+       "          n_jobs=None, penalty='l2', random_state=0, solver='liblinear',\n",
+       "          tol=0.0001, verbose=0, warm_start=False)"
+      ]
+     },
+     "execution_count": 107,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# fit the Logsitic Regression model with C=100\n",
+    "\n",
+    "# instantiate the model\n",
+    "logreg100 = LogisticRegression(C=100, solver='liblinear', random_state=0)\n",
+    "\n",
+    "\n",
+    "# fit the model\n",
+    "logreg100.fit(X_train, y_train)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 108,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Training set score: 0.8478\n",
+      "Test set score: 0.8505\n"
+     ]
+    }
+   ],
+   "source": [
+    "# print the scores on training and test set\n",
+    "\n",
+    "print('Training set score: {:.4f}'.format(logreg100.score(X_train, y_train)))\n",
+    "\n",
+    "print('Test set score: {:.4f}'.format(logreg100.score(X_test, y_test)))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "We can see that, C=100 results in higher test set accuracy and also a slightly increased training set accuracy. So, we can conclude that a more complex model should perform better."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Now, I will investigate, what happens if we use more regularized model than the default value of C=1, by setting C=0.01."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 109,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "LogisticRegression(C=0.01, class_weight=None, dual=False, fit_intercept=True,\n",
+       "          intercept_scaling=1, max_iter=100, multi_class='warn',\n",
+       "          n_jobs=None, penalty='l2', random_state=0, solver='liblinear',\n",
+       "          tol=0.0001, verbose=0, warm_start=False)"
+      ]
+     },
+     "execution_count": 109,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# fit the Logsitic Regression model with C=001\n",
+    "\n",
+    "# instantiate the model\n",
+    "logreg001 = LogisticRegression(C=0.01, solver='liblinear', random_state=0)\n",
+    "\n",
+    "\n",
+    "# fit the model\n",
+    "logreg001.fit(X_train, y_train)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 110,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Training set score: 0.8409\n",
+      "Test set score: 0.8448\n"
+     ]
+    }
+   ],
+   "source": [
+    "# print the scores on training and test set\n",
+    "\n",
+    "print('Training set score: {:.4f}'.format(logreg001.score(X_train, y_train)))\n",
+    "\n",
+    "print('Test set score: {:.4f}'.format(logreg001.score(X_test, y_test)))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "So, if we use more regularized model by setting C=0.01, then both the training and test set accuracy decrease relatiev to the default parameters."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Compare model accuracy with null accuracy\n",
+    "\n",
+    "\n",
+    "So, the model accuracy is 0.8501. But, we cannot say that our model is very good based on the above accuracy. We must compare it with the **null accuracy**. Null accuracy is the accuracy that could be achieved by always predicting the most frequent class.\n",
+    "\n",
+    "So, we should first check the class distribution in the test set. "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 111,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "No     22067\n",
+       "Yes     6372\n",
+       "Name: RainTomorrow, dtype: int64"
+      ]
+     },
+     "execution_count": 111,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# check class distribution in test set\n",
+    "\n",
+    "y_test.value_counts()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "We can see that the occurences of most frequent class is 22067. So, we can calculate null accuracy by dividing 22067 by total number of occurences."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 112,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Null accuracy score: 0.7759\n"
+     ]
+    }
+   ],
+   "source": [
+    "# check null accuracy score\n",
+    "\n",
+    "null_accuracy = (22067/(22067+6372))\n",
+    "\n",
+    "print('Null accuracy score: {0:0.4f}'. format(null_accuracy))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "We can see that our model accuracy score is 0.8501 but null accuracy score is 0.7759. So, we can conclude that our Logistic Regression model is doing a very good job in predicting the class labels."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Now, based on the above analysis we can conclude that our classification model accuracy is very good. Our model is doing a very good job in terms of predicting the class labels.\n",
+    "\n",
+    "\n",
+    "But, it does not give the underlying distribution of values. Also, it does not tell anything about the type of errors our classifer is making. \n",
+    "\n",
+    "\n",
+    "We have another tool called `Confusion matrix` that comes to our rescue."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## 15. Confusion matrix\n",
+    "\n",
+    "\n",
+    "A confusion matrix is a tool for summarizing the performance of a classification algorithm. A confusion matrix will give us a clear picture of classification model performance and the types of errors produced by the model. It gives us a summary of correct and incorrect predictions broken down by each category. The summary is represented in a tabular form.\n",
+    "\n",
+    "\n",
+    "Four types of outcomes are possible while evaluating a classification model performance. These four outcomes are described below:-\n",
+    "\n",
+    "\n",
+    "**True Positives (TP)** – True Positives occur when we predict an observation belongs to a certain class and the observation actually belongs to that class.\n",
+    "\n",
+    "\n",
+    "**True Negatives (TN)** – True Negatives occur when we predict an observation does not belong to a certain class and the observation actually does not belong to that class.\n",
+    "\n",
+    "\n",
+    "**False Positives (FP)** – False Positives occur when we predict an observation belongs to a    certain class but the observation actually does not belong to that class. This type of error is called **Type I error.**\n",
+    "\n",
+    "\n",
+    "\n",
+    "**False Negatives (FN)** – False Negatives occur when we predict an observation does not belong to a certain class but the observation actually belongs to that class. This is a very serious error and it is called **Type II error.**\n",
+    "\n",
+    "\n",
+    "\n",
+    "These four outcomes are summarized in a confusion matrix given below.\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 113,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Confusion matrix\n",
+      "\n",
+      " [[20892  1175]\n",
+      " [ 3087  3285]]\n",
+      "\n",
+      "True Positives(TP) =  20892\n",
+      "\n",
+      "True Negatives(TN) =  3285\n",
+      "\n",
+      "False Positives(FP) =  1175\n",
+      "\n",
+      "False Negatives(FN) =  3087\n"
+     ]
+    }
+   ],
+   "source": [
+    "# Print the Confusion Matrix and slice it into four pieces\n",
+    "\n",
+    "from sklearn.metrics import confusion_matrix\n",
+    "\n",
+    "cm = confusion_matrix(y_test, y_pred_test)\n",
+    "\n",
+    "print('Confusion matrix\\n\\n', cm)\n",
+    "\n",
+    "print('\\nTrue Positives(TP) = ', cm[0,0])\n",
+    "\n",
+    "print('\\nTrue Negatives(TN) = ', cm[1,1])\n",
+    "\n",
+    "print('\\nFalse Positives(FP) = ', cm[0,1])\n",
+    "\n",
+    "print('\\nFalse Negatives(FN) = ', cm[1,0])"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The confusion matrix shows `20892 + 3285 = 24177 correct predictions` and `3087 + 1175 = 4262 incorrect predictions`.\n",
+    "\n",
+    "\n",
+    "In this case, we have\n",
+    "\n",
+    "\n",
+    "- `True Positives` (Actual Positive:1 and Predict Positive:1) - 20892\n",
+    "\n",
+    "\n",
+    "- `True Negatives` (Actual Negative:0 and Predict Negative:0) - 3285\n",
+    "\n",
+    "\n",
+    "- `False Positives` (Actual Negative:0 but Predict Positive:1) - 1175 `(Type I error)`\n",
+    "\n",
+    "\n",
+    "- `False Negatives` (Actual Positive:1 but Predict Negative:0) - 3087 `(Type II error)`"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 114,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "<matplotlib.axes._subplots.AxesSubplot at 0xacc3104f60>"
+      ]
+     },
+     "execution_count": 114,
+     "metadata": {},
+     "output_type": "execute_result"
+    },
+    {
+     "data": {
+      "image/png": "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\n",
+      "text/plain": [
+       "<Figure size 432x288 with 2 Axes>"
+      ]
+     },
+     "metadata": {
+      "needs_background": "light"
+     },
+     "output_type": "display_data"
+    }
+   ],
+   "source": [
+    "# visualize confusion matrix with seaborn heatmap\n",
+    "\n",
+    "cm_matrix = pd.DataFrame(data=cm, columns=['Actual Positive:1', 'Actual Negative:0'], \n",
+    "                                 index=['Predict Positive:1', 'Predict Negative:0'])\n",
+    "\n",
+    "sns.heatmap(cm_matrix, annot=True, fmt='d', cmap='YlGnBu')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## 16. Classification metrices"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Classification Report\n",
+    "\n",
+    "\n",
+    "**Classification report** is another way to evaluate the classification model performance. It displays the  **precision**, **recall**, **f1** and **support** scores for the model. I have described these terms in later.\n",
+    "\n",
+    "We can print a classification report as follows:-"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 115,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "              precision    recall  f1-score   support\n",
+      "\n",
+      "          No       0.87      0.95      0.91     22067\n",
+      "         Yes       0.74      0.52      0.61      6372\n",
+      "\n",
+      "   micro avg       0.85      0.85      0.85     28439\n",
+      "   macro avg       0.80      0.73      0.76     28439\n",
+      "weighted avg       0.84      0.85      0.84     28439\n",
+      "\n"
+     ]
+    }
+   ],
+   "source": [
+    "from sklearn.metrics import classification_report\n",
+    "\n",
+    "print(classification_report(y_test, y_pred_test))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Classification accuracy"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 116,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "TP = cm[0,0]\n",
+    "TN = cm[1,1]\n",
+    "FP = cm[0,1]\n",
+    "FN = cm[1,0]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 117,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Classification accuracy : 0.8501\n"
+     ]
+    }
+   ],
+   "source": [
+    "# print classification accuracy\n",
+    "\n",
+    "classification_accuracy = (TP + TN) / float(TP + TN + FP + FN)\n",
+    "\n",
+    "print('Classification accuracy : {0:0.4f}'.format(classification_accuracy))\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Classification error"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 118,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Classification error : 0.1499\n"
+     ]
+    }
+   ],
+   "source": [
+    "# print classification error\n",
+    "\n",
+    "classification_error = (FP + FN) / float(TP + TN + FP + FN)\n",
+    "\n",
+    "print('Classification error : {0:0.4f}'.format(classification_error))\n"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Precision\n",
+    "\n",
+    "\n",
+    "**Precision** can be defined as the percentage of correctly predicted positive outcomes out of all the predicted positive outcomes. It can be given as the ratio of true positives (TP) to the sum of true and false positives (TP + FP). \n",
+    "\n",
+    "\n",
+    "So, **Precision** identifies the proportion of correctly predicted positive outcome. It is more concerned with the positive class than the negative class.\n",
+    "\n",
+    "\n",
+    "\n",
+    "Mathematically, precision can be defined as the ratio of `TP to (TP + FP).`\n",
+    "\n",
+    "\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 119,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Precision : 0.9468\n"
+     ]
+    }
+   ],
+   "source": [
+    "# print precision score\n",
+    "\n",
+    "precision = TP / float(TP + FP)\n",
+    "\n",
+    "\n",
+    "print('Precision : {0:0.4f}'.format(precision))\n"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Recall\n",
+    "\n",
+    "\n",
+    "Recall can be defined as the percentage of correctly predicted positive outcomes out of all the actual positive outcomes.\n",
+    "It can be given as the ratio of true positives (TP) to the sum of true positives and false negatives (TP + FN). **Recall** is also called **Sensitivity**.\n",
+    "\n",
+    "\n",
+    "**Recall** identifies the proportion of correctly predicted actual positives.\n",
+    "\n",
+    "\n",
+    "Mathematically, recall can be given as the ratio of `TP to (TP + FN).`\n",
+    "\n",
+    "\n",
+    "\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 120,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Recall or Sensitivity : 0.8713\n"
+     ]
+    }
+   ],
+   "source": [
+    "recall = TP / float(TP + FN)\n",
+    "\n",
+    "print('Recall or Sensitivity : {0:0.4f}'.format(recall))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### True Positive Rate\n",
+    "\n",
+    "\n",
+    "**True Positive Rate** is synonymous with **Recall**.\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 121,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "True Positive Rate : 0.8713\n"
+     ]
+    }
+   ],
+   "source": [
+    "true_positive_rate = TP / float(TP + FN)\n",
+    "\n",
+    "\n",
+    "print('True Positive Rate : {0:0.4f}'.format(true_positive_rate))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### False Positive Rate"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 122,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "False Positive Rate : 0.2635\n"
+     ]
+    }
+   ],
+   "source": [
+    "false_positive_rate = FP / float(FP + TN)\n",
+    "\n",
+    "\n",
+    "print('False Positive Rate : {0:0.4f}'.format(false_positive_rate))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Specificity"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 123,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Specificity : 0.7365\n"
+     ]
+    }
+   ],
+   "source": [
+    "specificity = TN / (TN + FP)\n",
+    "\n",
+    "print('Specificity : {0:0.4f}'.format(specificity))"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### f1-score\n",
+    "\n",
+    "\n",
+    "**f1-score** is the weighted harmonic mean of precision and recall. The best possible **f1-score** would be 1.0 and the worst \n",
+    "would be 0.0.  **f1-score** is the harmonic mean of precision and recall. So, **f1-score** is always lower than accuracy measures as they embed precision and recall into their computation. The weighted average of `f1-score` should be used to \n",
+    "compare classifier models, not global accuracy.\n",
+    "\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Support\n",
+    "\n",
+    "\n",
+    "**Support** is the actual number of occurrences of the class in our dataset."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## 17. Adjusting the threshold level"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 124,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "array([[0.91387232, 0.08612768],\n",
+       "       [0.83563172, 0.16436828],\n",
+       "       [0.82035588, 0.17964412],\n",
+       "       [0.99025882, 0.00974118],\n",
+       "       [0.95726809, 0.04273191],\n",
+       "       [0.97994232, 0.02005768],\n",
+       "       [0.17838588, 0.82161412],\n",
+       "       [0.23482434, 0.76517566],\n",
+       "       [0.90050811, 0.09949189],\n",
+       "       [0.85480088, 0.14519912]])"
+      ]
+     },
+     "execution_count": 124,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# print the first 10 predicted probabilities of two classes- 0 and 1\n",
+    "\n",
+    "y_pred_prob = logreg.predict_proba(X_test)[0:10]\n",
+    "\n",
+    "y_pred_prob"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Observations\n",
+    "\n",
+    "\n",
+    "- In each row, the numbers sum to 1.\n",
+    "\n",
+    "\n",
+    "- There are 2 columns which correspond to 2 classes - 0 and 1.\n",
+    "\n",
+    "    - Class 0 - predicted probability that there is no rain tomorrow.    \n",
+    "    \n",
+    "    - Class 1 - predicted probability that there is rain tomorrow.\n",
+    "        \n",
+    "    \n",
+    "- Importance of predicted probabilities\n",
+    "\n",
+    "    - We can rank the observations by probability of rain or no rain.\n",
+    "\n",
+    "\n",
+    "- predict_proba process\n",
+    "\n",
+    "    - Predicts the probabilities    \n",
+    "    \n",
+    "    - Choose the class with the highest probability    \n",
+    "    \n",
+    "    \n",
+    "- Classification threshold level\n",
+    "\n",
+    "    - There is a classification threshold level of 0.5.    \n",
+    "    \n",
+    "    - Class 1 - probability of rain is predicted if probability > 0.5.    \n",
+    "    \n",
+    "    - Class 0 - probability of no rain is predicted if probability < 0.5.    \n",
+    "    \n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 125,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>Prob of - No rain tomorrow (0)</th>\n",
+       "      <th>Prob of - Rain tomorrow (1)</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>0.913872</td>\n",
+       "      <td>0.086128</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>0.835632</td>\n",
+       "      <td>0.164368</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>0.820356</td>\n",
+       "      <td>0.179644</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>0.990259</td>\n",
+       "      <td>0.009741</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>0.957268</td>\n",
+       "      <td>0.042732</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>5</th>\n",
+       "      <td>0.979942</td>\n",
+       "      <td>0.020058</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>6</th>\n",
+       "      <td>0.178386</td>\n",
+       "      <td>0.821614</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>7</th>\n",
+       "      <td>0.234824</td>\n",
+       "      <td>0.765176</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>8</th>\n",
+       "      <td>0.900508</td>\n",
+       "      <td>0.099492</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>9</th>\n",
+       "      <td>0.854801</td>\n",
+       "      <td>0.145199</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "   Prob of - No rain tomorrow (0)  Prob of - Rain tomorrow (1)\n",
+       "0                        0.913872                     0.086128\n",
+       "1                        0.835632                     0.164368\n",
+       "2                        0.820356                     0.179644\n",
+       "3                        0.990259                     0.009741\n",
+       "4                        0.957268                     0.042732\n",
+       "5                        0.979942                     0.020058\n",
+       "6                        0.178386                     0.821614\n",
+       "7                        0.234824                     0.765176\n",
+       "8                        0.900508                     0.099492\n",
+       "9                        0.854801                     0.145199"
+      ]
+     },
+     "execution_count": 125,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# store the probabilities in dataframe\n",
+    "\n",
+    "y_pred_prob_df = pd.DataFrame(data=y_pred_prob, columns=['Prob of - No rain tomorrow (0)', 'Prob of - Rain tomorrow (1)'])\n",
+    "\n",
+    "y_pred_prob_df"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 126,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "array([0.08612768, 0.16436828, 0.17964412, 0.00974118, 0.04273191,\n",
+       "       0.02005768, 0.82161412, 0.76517566, 0.09949189, 0.14519912])"
+      ]
+     },
+     "execution_count": 126,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# print the first 10 predicted probabilities for class 1 - Probability of rain\n",
+    "\n",
+    "logreg.predict_proba(X_test)[0:10, 1]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 127,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# store the predicted probabilities for class 1 - Probability of rain\n",
+    "\n",
+    "y_pred1 = logreg.predict_proba(X_test)[:, 1]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 128,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "Text(0,0.5,'Frequency')"
+      ]
+     },
+     "execution_count": 128,
+     "metadata": {},
+     "output_type": "execute_result"
+    },
+    {
+     "data": {
+      "image/png": "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\n",
+      "text/plain": [
+       "<Figure size 432x288 with 1 Axes>"
+      ]
+     },
+     "metadata": {
+      "needs_background": "light"
+     },
+     "output_type": "display_data"
+    }
+   ],
+   "source": [
+    "# plot histogram of predicted probabilities\n",
+    "\n",
+    "\n",
+    "# adjust the font size \n",
+    "plt.rcParams['font.size'] = 12\n",
+    "\n",
+    "\n",
+    "# plot histogram with 10 bins\n",
+    "plt.hist(y_pred1, bins = 10)\n",
+    "\n",
+    "\n",
+    "# set the title of predicted probabilities\n",
+    "plt.title('Histogram of predicted probabilities of rain')\n",
+    "\n",
+    "\n",
+    "# set the x-axis limit\n",
+    "plt.xlim(0,1)\n",
+    "\n",
+    "\n",
+    "# set the title\n",
+    "plt.xlabel('Predicted probabilities of rain')\n",
+    "plt.ylabel('Frequency')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Observations\n",
+    "\n",
+    "\n",
+    "- We can see that the above histogram is highly positive skewed.\n",
+    "\n",
+    "\n",
+    "- The first column tell us that there are approximately 15000 observations with probability between 0.0 and 0.1.\n",
+    "\n",
+    "\n",
+    "- There are small number of observations with probability > 0.5.\n",
+    "\n",
+    "\n",
+    "- So, these small number of observations predict that there will be rain tomorrow.\n",
+    "\n",
+    "\n",
+    "- Majority of observations predict that there will be no rain tomorrow."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Lower the threshold"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 129,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "With 0.1 threshold the Confusion Matrix is  \n",
+      "\n",
+      " [[12726  9341]\n",
+      " [  547  5825]] \n",
+      "\n",
+      " with 18551 correct predictions,  \n",
+      "\n",
+      " 9341 Type I errors( False Positives),  \n",
+      "\n",
+      " 547 Type II errors( False Negatives),  \n",
+      "\n",
+      " Accuracy score:  0.6523084496641935 \n",
+      "\n",
+      " Sensitivity:  0.9141556811048337 \n",
+      "\n",
+      " Specificity:  0.5766982371867494 \n",
+      "\n",
+      " ==================================================== \n",
+      "\n",
+      "\n",
+      "With 0.2 threshold the Confusion Matrix is  \n",
+      "\n",
+      " [[17067  5000]\n",
+      " [ 1233  5139]] \n",
+      "\n",
+      " with 22206 correct predictions,  \n",
+      "\n",
+      " 5000 Type I errors( False Positives),  \n",
+      "\n",
+      " 1233 Type II errors( False Negatives),  \n",
+      "\n",
+      " Accuracy score:  0.7808291430781673 \n",
+      "\n",
+      " Sensitivity:  0.806497175141243 \n",
+      "\n",
+      " Specificity:  0.7734173199800607 \n",
+      "\n",
+      " ==================================================== \n",
+      "\n",
+      "\n",
+      "With 0.3 threshold the Confusion Matrix is  \n",
+      "\n",
+      " [[19080  2987]\n",
+      " [ 1873  4499]] \n",
+      "\n",
+      " with 23579 correct predictions,  \n",
+      "\n",
+      " 2987 Type I errors( False Positives),  \n",
+      "\n",
+      " 1873 Type II errors( False Negatives),  \n",
+      "\n",
+      " Accuracy score:  0.8291079151868912 \n",
+      "\n",
+      " Sensitivity:  0.7060577526679221 \n",
+      "\n",
+      " Specificity:  0.8646395069560883 \n",
+      "\n",
+      " ==================================================== \n",
+      "\n",
+      "\n",
+      "With 0.4 threshold the Confusion Matrix is  \n",
+      "\n",
+      " [[20191  1876]\n",
+      " [ 2517  3855]] \n",
+      "\n",
+      " with 24046 correct predictions,  \n",
+      "\n",
+      " 1876 Type I errors( False Positives),  \n",
+      "\n",
+      " 2517 Type II errors( False Negatives),  \n",
+      "\n",
+      " Accuracy score:  0.845529027040332 \n",
+      "\n",
+      " Sensitivity:  0.6049905838041432 \n",
+      "\n",
+      " Specificity:  0.9149861784565188 \n",
+      "\n",
+      " ==================================================== \n",
+      "\n",
+      "\n"
+     ]
+    }
+   ],
+   "source": [
+    "from sklearn.preprocessing import binarize\n",
+    "\n",
+    "for i in range(1,5):\n",
+    "    \n",
+    "    cm1=0\n",
+    "    \n",
+    "    y_pred1 = logreg.predict_proba(X_test)[:,1]\n",
+    "    \n",
+    "    y_pred1 = y_pred1.reshape(-1,1)\n",
+    "    \n",
+    "    y_pred2 = binarize(y_pred1, i/10)\n",
+    "    \n",
+    "    y_pred2 = np.where(y_pred2 == 1, 'Yes', 'No')\n",
+    "    \n",
+    "    cm1 = confusion_matrix(y_test, y_pred2)\n",
+    "        \n",
+    "    print ('With',i/10,'threshold the Confusion Matrix is ','\\n\\n',cm1,'\\n\\n',\n",
+    "           \n",
+    "            'with',cm1[0,0]+cm1[1,1],'correct predictions, ', '\\n\\n', \n",
+    "           \n",
+    "            cm1[0,1],'Type I errors( False Positives), ','\\n\\n',\n",
+    "           \n",
+    "            cm1[1,0],'Type II errors( False Negatives), ','\\n\\n',\n",
+    "           \n",
+    "           'Accuracy score: ', (accuracy_score(y_test, y_pred2)), '\\n\\n',\n",
+    "           \n",
+    "           'Sensitivity: ',cm1[1,1]/(float(cm1[1,1]+cm1[1,0])), '\\n\\n',\n",
+    "           \n",
+    "           'Specificity: ',cm1[0,0]/(float(cm1[0,0]+cm1[0,1])),'\\n\\n',\n",
+    "          \n",
+    "            '====================================================', '\\n\\n')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Comments\n",
+    "\n",
+    "\n",
+    "- In binary problems, the threshold of 0.5 is used by default to convert predicted probabilities into class predictions.\n",
+    "\n",
+    "\n",
+    "- Threshold can be adjusted to increase sensitivity or specificity. \n",
+    "\n",
+    "\n",
+    "- Sensitivity and specificity have an inverse relationship. Increasing one would always decrease the other and vice versa.\n",
+    "\n",
+    "\n",
+    "- We can see that increasing the threshold level results in increased accuracy.\n",
+    "\n",
+    "\n",
+    "- Adjusting the threshold level should be one of the last step you do in the model-building process."
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## 18. ROC - AUC\n",
+    "\n",
+    "\n",
+    "\n",
+    "### ROC Curve\n",
+    "\n",
+    "\n",
+    "Another tool to measure the classification model performance visually is **ROC Curve**. ROC Curve stands for **Receiver Operating Characteristic Curve**. An **ROC Curve** is a plot which shows the performance of a classification model at various \n",
+    "classification threshold levels. \n",
+    "\n",
+    "\n",
+    "\n",
+    "The **ROC Curve** plots the **True Positive Rate (TPR)** against the **False Positive Rate (FPR)** at various threshold levels.\n",
+    "\n",
+    "\n",
+    "\n",
+    "**True Positive Rate (TPR)** is also called **Recall**. It is defined as the ratio of `TP to (TP + FN).`\n",
+    "\n",
+    "\n",
+    "\n",
+    "**False Positive Rate (FPR)** is defined as the ratio of `FP to (FP + TN).`\n",
+    "\n",
+    "\n",
+    "\n",
+    "\n",
+    "\n",
+    "\n",
+    "\n",
+    "In the ROC Curve, we will focus on the TPR (True Positive Rate) and FPR (False Positive Rate) of a single point. This will give us the general performance of the ROC curve which consists of the TPR and FPR at various threshold levels. So, an ROC Curve plots TPR vs FPR at different classification threshold levels. If we lower the threshold levels, it may result in more items being classified as positve. It will increase both True Positives (TP) and False Positives (FP).\n",
+    "\n",
+    "\n",
+    "\n",
+    "\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 130,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "image/png": "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\n",
+      "text/plain": [
+       "<Figure size 432x288 with 1 Axes>"
+      ]
+     },
+     "metadata": {
+      "needs_background": "light"
+     },
+     "output_type": "display_data"
+    }
+   ],
+   "source": [
+    "# plot ROC Curve\n",
+    "\n",
+    "from sklearn.metrics import roc_curve\n",
+    "\n",
+    "fpr, tpr, thresholds = roc_curve(y_test, y_pred1, pos_label = 'Yes')\n",
+    "\n",
+    "plt.figure(figsize=(6,4))\n",
+    "\n",
+    "plt.plot(fpr, tpr, linewidth=2)\n",
+    "\n",
+    "plt.plot([0,1], [0,1], 'k--' )\n",
+    "\n",
+    "plt.rcParams['font.size'] = 12\n",
+    "\n",
+    "plt.title('ROC curve for RainTomorrow classifier')\n",
+    "\n",
+    "plt.xlabel('False Positive Rate (1 - Specificity)')\n",
+    "\n",
+    "plt.ylabel('True Positive Rate (Sensitivity)')\n",
+    "\n",
+    "plt.show()\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "ROC curve help us to choose a threshold level that balances sensitivity and specificity for a particular context."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### ROC  AUC\n",
+    "\n",
+    "\n",
+    "**ROC AUC** stands for **Receiver Operating Characteristic - Area Under Curve**. It is a technique to compare classifier performance. In this technique, we measure the `area under the curve (AUC)`. A perfect classifier will have a ROC AUC equal to 1, whereas a purely random classifier will have a ROC AUC equal to 0.5. \n",
+    "\n",
+    "\n",
+    "So, **ROC AUC** is the percentage of the ROC plot that is underneath the curve."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 131,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "ROC AUC : 0.8729\n"
+     ]
+    }
+   ],
+   "source": [
+    "# compute ROC AUC\n",
+    "\n",
+    "from sklearn.metrics import roc_auc_score\n",
+    "\n",
+    "ROC_AUC = roc_auc_score(y_test, y_pred1)\n",
+    "\n",
+    "print('ROC AUC : {:.4f}'.format(ROC_AUC))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Comments\n",
+    "\n",
+    "\n",
+    "- ROC AUC is a single number summary of classifier performance. The higher the value, the better the classifier.\n",
+    "\n",
+    "- ROC AUC of our model approaches towards 1. So, we can conclude that our classifier does a good job in predicting whether it will rain tomorrow or not."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 132,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Cross validated ROC AUC : 0.8695\n"
+     ]
+    }
+   ],
+   "source": [
+    "# calculate cross-validated ROC AUC \n",
+    "\n",
+    "from sklearn.model_selection import cross_val_score\n",
+    "\n",
+    "Cross_validated_ROC_AUC = cross_val_score(logreg, X_train, y_train, cv=5, scoring='roc_auc').mean()\n",
+    "\n",
+    "print('Cross validated ROC AUC : {:.4f}'.format(Cross_validated_ROC_AUC))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Model evaluation and improvement\n",
+    "\n",
+    "\n",
+    "\n",
+    "In this section, I will employ several techniques to improve the model performance. I will discuss 3 techniques which are used in practice for performance improvement. These are `recursive feature elimination`, `k-fold cross validation` and `hyperparameter optimization using GridSearchCV`."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## 19. Recursive Feature Elimination with Cross Validation\n",
+    "\n",
+    "\n",
+    "`Recursive feature elimination (RFE)` is a feature selection technique that helps us to select best features from the given number of features. At first, the model is built on all the given features. Then, it removes the least useful predictor and build the model again. This process is repeated until all the unimportant features are removed from the model.\n",
+    "\n",
+    "\n",
+    "`Recursive Feature Elimination with Cross-Validated (RFECV) feature selection` technique selects the best subset of features for the estimator by removing 0 to N features iteratively using recursive feature elimination. Then it selects the best subset based on the accuracy or cross-validation score or roc-auc of the model. Recursive feature elimination technique eliminates n features from a model by fitting the model multiple times and at each step, removing the weakest features.\n",
+    "\n",
+    "\n",
+    "I will use this technique to select best features from this model."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 133,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from sklearn.feature_selection import RFECV\n",
+    "\n",
+    "rfecv = RFECV(estimator=logreg, step=1, cv=5, scoring='accuracy')\n",
+    "\n",
+    "rfecv = rfecv.fit(X_train, y_train)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 134,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Optimal number of features : 112\n"
+     ]
+    }
+   ],
+   "source": [
+    "print(\"Optimal number of features : %d\" % rfecv.n_features_)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 135,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "LogisticRegression(C=1.0, class_weight=None, dual=False, fit_intercept=True,\n",
+       "          intercept_scaling=1, max_iter=100, multi_class='warn',\n",
+       "          n_jobs=None, penalty='l2', random_state=0, solver='liblinear',\n",
+       "          tol=0.0001, verbose=0, warm_start=False)"
+      ]
+     },
+     "execution_count": 135,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# transform the training data\n",
+    "\n",
+    "X_train_rfecv = rfecv.transform(X_train)\n",
+    "\n",
+    "\n",
+    "# train classifier\n",
+    "\n",
+    "logreg.fit(X_train_rfecv, y_train)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 136,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# test classifier on test data\n",
+    "\n",
+    "X_test_rfecv = rfecv.transform(X_test)\n",
+    "\n",
+    "y_pred_rfecv = logreg.predict(X_test_rfecv)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 137,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Classifier score: 0.8500\n"
+     ]
+    }
+   ],
+   "source": [
+    "# print mean accuracy on transformed test data and labels\n",
+    "\n",
+    "print (\"Classifier score: {:.4f}\".format(logreg.score(X_test_rfecv,y_test)))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Our original model accuracy score is 0.8501 whereas accuracy score after RFECV is 0.8500. So, we can obtain approximately similar accuracy but with reduced or optimal set of features."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Confusion-matrix revisited\n",
+    "\n",
+    "\n",
+    "I will again plot the confusion-matrix for this model to get an idea of errors our model is making."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 138,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Confusion matrix\n",
+      "\n",
+      " [[20893  1174]\n",
+      " [ 3091  3281]]\n",
+      "\n",
+      "True Positives(TP1) =  20893\n",
+      "\n",
+      "True Negatives(TN1) =  3281\n",
+      "\n",
+      "False Positives(FP1) =  1174\n",
+      "\n",
+      "False Negatives(FN1) =  3091\n"
+     ]
+    }
+   ],
+   "source": [
+    "from sklearn.metrics import confusion_matrix\n",
+    "\n",
+    "cm1 = confusion_matrix(y_test, y_pred_rfecv)\n",
+    "\n",
+    "print('Confusion matrix\\n\\n', cm1)\n",
+    "\n",
+    "print('\\nTrue Positives(TP1) = ', cm1[0,0])\n",
+    "\n",
+    "print('\\nTrue Negatives(TN1) = ', cm1[1,1])\n",
+    "\n",
+    "print('\\nFalse Positives(FP1) = ', cm1[0,1])\n",
+    "\n",
+    "print('\\nFalse Negatives(FN1) = ', cm1[1,0])"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "We can see that in the original model, we have FP = 1175 whereas FP1 = 1174. So, we get approximately same number of false positives. Also, FN = 3087 whereas FN1 = 3091. So, we get slightly higher false negatives."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## 20. k-Fold Cross Validation"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 139,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Cross-validation scores:[0.84690783 0.84624852 0.84633642 0.84958903 0.84773626]\n"
+     ]
+    }
+   ],
+   "source": [
+    "# Applying 10-Fold Cross Validation\n",
+    "\n",
+    "from sklearn.model_selection import cross_val_score\n",
+    "\n",
+    "scores = cross_val_score(logreg, X_train, y_train, cv = 5, scoring='accuracy')\n",
+    "\n",
+    "print('Cross-validation scores:{}'.format(scores))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "We can summarize the cross-validation accuracy by calculating its mean."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 140,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Average cross-validation score: 0.8474\n"
+     ]
+    }
+   ],
+   "source": [
+    "# compute Average cross-validation score\n",
+    "\n",
+    "print('Average cross-validation score: {:.4f}'.format(scores.mean()))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Our, original model score is found to be 0.8476. The average cross-validation score is 0.8474. So, we can conclude that cross-validation does not result in performance improvement."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## 21. Hyperparameter Optimization using GridSearch CV"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 141,
+   "metadata": {
+    "scrolled": true
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "GridSearchCV(cv=5, error_score='raise-deprecating',\n",
+       "       estimator=LogisticRegression(C=1.0, class_weight=None, dual=False, fit_intercept=True,\n",
+       "          intercept_scaling=1, max_iter=100, multi_class='warn',\n",
+       "          n_jobs=None, penalty='l2', random_state=0, solver='liblinear',\n",
+       "          tol=0.0001, verbose=0, warm_start=False),\n",
+       "       fit_params=None, iid='warn', n_jobs=None,\n",
+       "       param_grid=[{'penalty': ['l1', 'l2']}, {'C': [1, 10, 100, 1000]}],\n",
+       "       pre_dispatch='2*n_jobs', refit=True, return_train_score='warn',\n",
+       "       scoring='accuracy', verbose=0)"
+      ]
+     },
+     "execution_count": 141,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "from sklearn.model_selection import GridSearchCV\n",
+    "\n",
+    "\n",
+    "parameters = [{'penalty':['l1','l2']}, \n",
+    "              {'C':[1, 10, 100, 1000]}]\n",
+    "\n",
+    "\n",
+    "\n",
+    "grid_search = GridSearchCV(estimator = logreg,  \n",
+    "                           param_grid = parameters,\n",
+    "                           scoring = 'accuracy',\n",
+    "                           cv = 5,\n",
+    "                           verbose=0)\n",
+    "\n",
+    "\n",
+    "grid_search.fit(X_train, y_train)\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 142,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "GridSearch CV best score : 0.8474\n",
+      "\n",
+      "\n",
+      "Parameters that give the best results : \n",
+      "\n",
+      " {'penalty': 'l1'}\n",
+      "\n",
+      "\n",
+      "Estimator that was chosen by the search : \n",
+      "\n",
+      " LogisticRegression(C=1.0, class_weight=None, dual=False, fit_intercept=True,\n",
+      "          intercept_scaling=1, max_iter=100, multi_class='warn',\n",
+      "          n_jobs=None, penalty='l1', random_state=0, solver='liblinear',\n",
+      "          tol=0.0001, verbose=0, warm_start=False)\n"
+     ]
+    }
+   ],
+   "source": [
+    "# examine the best model\n",
+    "\n",
+    "# best score achieved during the GridSearchCV\n",
+    "print('GridSearch CV best score : {:.4f}\\n\\n'.format(grid_search.best_score_))\n",
+    "\n",
+    "# print parameters that give the best results\n",
+    "print('Parameters that give the best results :','\\n\\n', (grid_search.best_params_))\n",
+    "\n",
+    "# print estimator that was chosen by the GridSearch\n",
+    "print('\\n\\nEstimator that was chosen by the search :','\\n\\n', (grid_search.best_estimator_))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 143,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "GridSearch CV score on test set: 0.8507\n"
+     ]
+    }
+   ],
+   "source": [
+    "# calculate GridSearch CV score on test set\n",
+    "\n",
+    "print('GridSearch CV score on test set: {0:0.4f}'.format(grid_search.score(X_test, y_test)))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Comments\n",
+    "\n",
+    "\n",
+    "- Our original model test accuracy is 0.8501 while GridSearch CV accuracy is 0.8507.\n",
+    "\n",
+    "\n",
+    "- We can see that GridSearch CV improve the performance for this particular model."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## 22. Results and Conclusion"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "1.\tThe logistic regression model accuracy score is 0.8501. So, the model does a very good job in predicting whether or not it will rain tomorrow in Australia.\n",
+    "\n",
+    "2.\tSmall number of observations predict that there will be rain tomorrow. Majority of observations predict that there will be no rain tomorrow.\n",
+    "\n",
+    "3.\tThe model shows no signs of overfitting.\n",
+    "\n",
+    "4.\tIncreasing the value of C results in higher test set accuracy and also a slightly increased training set accuracy. So, we can conclude that a more complex model should perform better.\n",
+    "\n",
+    "5.\tIncreasing the threshold level results in increased accuracy.\n",
+    "\n",
+    "6.\tROC AUC of our model approaches towards 1. So, we can conclude that our classifier does a good job in predicting whether it will rain tomorrow or not.\n",
+    "\n",
+    "7.\tOur original model accuracy score is 0.8501 whereas accuracy score after RFECV is 0.8500. So, we can obtain approximately similar accuracy but with reduced set of features.\n",
+    "\n",
+    "8.\tIn the original model, we have FP = 1175 whereas FP1 = 1174. So, we get approximately same number of false positives. Also, FN = 3087 whereas FN1 = 3091. So, we get slighly higher false negatives.\n",
+    "\n",
+    "9.\tOur, original model score is found to be 0.8476. The average cross-validation score is 0.8474. So, we can conclude that cross-validation does not result in performance improvement.\n",
+    "\n",
+    "10.\tOur original model test accuracy is 0.8501 while GridSearch CV accuracy is 0.8507. We can see that GridSearch CV improve the performance for this particular model.\n"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.7.0"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 2
+}
