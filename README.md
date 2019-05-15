@@ -1,4 +1,4 @@
-# Logistic Regression with Python Project
+# Logistic Regression with Python and Scikit-Learn Project
 
 
 In this project, I implement Logistic Regression algorithm with Python. I build a classifier to predict whether or not it will rain tomorrow in Australia by training a binary classification model using Logistic Regression. I have used the **Rain in Australia** data set downloaded from the Kaggle website for this project.
@@ -395,7 +395,7 @@ The work done in this project is inspired from following books and websites:-
 1.	Hands on Machine Learning with Scikit-Learn and Tensorflow by Aurélién Géron
 
 
-2.	Introduction to Machine Learning with Python
+2.	Introduction to Machine Learning with Python by Andreas C. Müller and Sarah Guido
 
 
 3.	Udemy course – Machine Learning – A Z by Kirill Eremenko and Hadelin de Ponteves
